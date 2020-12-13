@@ -1,12 +1,12 @@
 //import Stuff
-import React, {  useRef, useContext } from 'react';
+import React, {  useRef, useContext,useState } from 'react';
 import { View,  TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import { MaterialIcons, Feather } from '@expo/vector-icons';
 import {Context} from '../Context/dishContext';
 /*
 Custom button for adding or removing dishes to/from the Cart
 */ 
-const Custombutton = ({ count, incCount, decCount,dish,restid,restname,restimg }) => {
+const Custombutton = ({ dish,restid,restname,restimg }) => {
 /* 
 Use of context API for data management across components. 
     basically to show data in to the cart screen 
@@ -29,6 +29,8 @@ Use of context API for data management across components.
         dish,
         quantity: 1
     }
+
+    const [count,setcount] = useState(0);
 
     // Animation function for moving the add button down
     const addMovesDown = () => {
@@ -81,7 +83,7 @@ Use of context API for data management across components.
                     plusMovesRight();
                     minusMovesLeft();
                     setTimeout(() => {
-                        incCount();
+                        setcount(count+1);
                     }, 300); 
                     
 
@@ -98,7 +100,7 @@ Use of context API for data management across components.
             </View> :
             <View style={styles.container}>
                 <TouchableOpacity onPress={() => {
-                    decCount();
+                    setcount(count-1);
                     removeFromCart(item);
                 }} style={styles.iconStyle}>
                     <Animated.View style={[
@@ -122,7 +124,7 @@ Use of context API for data management across components.
                     ]
                 }]}>{count}</Animated.Text>
                 <TouchableOpacity onPress={() => {
-                    incCount();
+                    setcount(count+1);
     
                     addToCart(item)
                 }} style={styles.iconStyle}>

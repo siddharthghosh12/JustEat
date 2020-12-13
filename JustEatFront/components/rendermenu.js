@@ -11,7 +11,7 @@ const Rendermenu = ({ res,restid,restname,restimg }) => {
     const navigation = useNavigation();
     const server = Server;
     const feature = res.bestSeller || res.mustTry;
-    const [count, setcount] = useState(0);
+
    
 
 
@@ -40,7 +40,7 @@ const Rendermenu = ({ res,restid,restname,restimg }) => {
                 <View>
                     <ImageBackground style={styles.imgstyle}
                         source={{ uri: `${server}/${res.image}` }} >
-                        <Custombutton count={count} incCount={() => setcount(count + 1)} decCount={() => setcount(count - 1)} dish={res} restid={restid} restname={restname} restimg={restimg} />
+                        <Custombutton  dish={res} restid={restid} restname={restname} restimg={restimg} />
                     </ImageBackground>
                 </View>
             </View>

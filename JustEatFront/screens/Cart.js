@@ -12,15 +12,13 @@ const CartScreen = () => {
     const {state} = useContext(Context);
     const navigation = useNavigation();
     const server = Server;
-    console.log('--------------------------------------------------');
-    {state.length !== 0 ?console.log(state[0].restimg) : console.log('No items added')}
-    console.log('--------------------------------------------------');
+
 
     const listheader = () => {
         return(
             <View style={styles.headercont}>
                 <Image source={{uri:`${server}/${state[0].restimg}`}} style={styles.imgstyle} />
-                <Text>{state[0].restname}</Text>   
+                <Text style={styles.headerText}>{state[0].restname}</Text>   
             </View>
         );
     }
@@ -62,12 +60,21 @@ const styles = StyleSheet.create({
         color:'#A9A9A9'
     },
     imgstyle:{
-        width:50,
+        width:60,
         height:50
     },
     headercont:{
         flexDirection:'row',
-        flex:1
+        flex:1,
+        margin:15,
+        marginBottom:20,
+        
+    },
+    headerText:{
+        fontSize:16,
+        fontWeight:'bold',
+        marginLeft:10,
+        alignSelf:'center'
     }
 })
 
