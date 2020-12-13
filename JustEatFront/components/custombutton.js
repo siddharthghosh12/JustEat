@@ -16,10 +16,10 @@ Use of context API for data management across components.
     const onClickAdd = useRef(new Animated.Value(0)).current;
 
     // Variable for animating the Plus(+) icon from left to right
-    const PlusIcon = useRef(new Animated.Value(-60)).current;
+    const PlusIcon = useRef(new Animated.Value(-30)).current;
 
     // Variable for animating the Minus(-) icon from right to left
-    const MinusIcon = useRef(new Animated.Value(60)).current;
+    const MinusIcon = useRef(new Animated.Value(30)).current;
 
     // item to be send as Payload to the dishContext,js file
     const item = { 
@@ -51,7 +51,7 @@ Use of context API for data management across components.
     const plusMovesRight = () => {
         Animated.timing(PlusIcon, {
             toValue: 0,
-            duration: 800,
+            duration: 600,
             useNativeDriver: true
         }).start();
     }
@@ -60,7 +60,7 @@ Use of context API for data management across components.
     const minusMovesLeft = () => {
         Animated.timing(MinusIcon, {
             toValue: 0,
-            duration: 800,
+            duration: 600,
             useNativeDriver: true
         }).start()
     }
@@ -84,7 +84,7 @@ Use of context API for data management across components.
                     minusMovesLeft();
                     setTimeout(() => {
                         setcount(count+1);
-                    }, 300); 
+                    }, 500); 
                     
 
                 }}>
