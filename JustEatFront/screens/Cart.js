@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Text, View, StyleSheet, FlatList, Image, TextInput } from 'react-native';
 import { Foundation } from '@expo/vector-icons';
 import { Divider, CheckBox } from 'react-native-elements'
@@ -8,6 +8,7 @@ import { Context } from '../Context/dishContext';
 import Cartlogo from '../logo/Cartlogo';
 import Cartlist from '../components/cartlist';
 import Border from '../thickborder';
+import Billcompo from '../components/Bill';
 
 import Server from '../server';
 
@@ -18,6 +19,11 @@ const CartScreen = () => {
     const [deliver, setdeliver] = useState(false);
     const [dinein, setdinein] = useState(false);
     const server = Server;
+    const getTotal = state.reduce((sum,item) => {
+        return sum + item.dish.Price*item.quantity;
+    },0);
+
+    
 
 
     const listheader = () => {
@@ -39,7 +45,7 @@ const CartScreen = () => {
                     <TextInput style={styles.search} placeholder='Any requests? We will try our best' value={term}
                         onChangeText={() => setterm()} />
                 </View>
-                <Border height={20} />
+                <Border height={15} />
                 <View style={styles.checkcont}>
                     <CheckBox title='Opt for Delievery' checked={deliver}
                         containerStyle={styles.CheckBoxstyle} onPress={() => {
@@ -54,8 +60,10 @@ const CartScreen = () => {
                             if (deliver) {
                                 setdeliver(!deliver);
                             }
-                        }} textStyle={{ color: '#4DC9ff' }} checkedColor='#4dc9ff'/>
+                        }} textStyle={{ color: '#4DC9ff' }} checkedColor='#4dc9ff' />
                 </View>
+                <Border height={15} />
+                <Billcompo total={getTotal} />
             </View>
         );
     }
@@ -73,7 +81,8 @@ const CartScreen = () => {
                     containerStyle={{ marginTop: 20 }}
                     type="outline"
                     onPress={() => navigation.navigate('JUSTEAT')} />
-            </View> :
+            </View>
+            :
             <View style={{ marginTop: 30, flex: 1 }}>
                 <FlatList
                     data={state}
@@ -91,7 +100,8 @@ const styles = StyleSheet.create({
     text: {
         fontSize: 16,
         fontWeight: 'bold',
-        marginBottom: 10
+        marginBottom: 10,
+        marginTop:10
     },
     infoText: {
         color: '#A9A9A9'
@@ -127,11 +137,11 @@ const styles = StyleSheet.create({
         borderColor: '#4DC9FF',
         borderWidth: 1,
         backgroundColor: '#D8F2FF',
-        width:160
+        width: 160
     },
     checkcont: {
         flexDirection: 'row',
-        marginTop:10
+        marginVertical:15
     }
 })
 

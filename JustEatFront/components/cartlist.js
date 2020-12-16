@@ -34,7 +34,7 @@ const Cartlist = ({result}) => {
 const styles = StyleSheet.create({
     innercont:{
         borderColor:'#A9A9A9',
-        borderWidth:2,
+        borderWidth:1,
         flexDirection:'row'
     },
     Textstyle:{

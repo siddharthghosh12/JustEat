@@ -1,28 +1,24 @@
 //import Stuff
-import React, {  useRef, useContext,useState } from 'react';
-import { View,  TouchableOpacity, StyleSheet, Animated } from 'react-native';
+import React, { useRef, useContext, useState, useEffect } from 'react';
+import { View, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import { MaterialIcons, Feather } from '@expo/vector-icons';
-import {Context} from '../Context/dishContext';
+import { Context } from '../Context/dishContext';
 /*
 Custom button for adding or removing dishes to/from the Cart
-*/ 
-const Custombutton = ({ dish,restid,restname,restimg }) => {
-/* 
-Use of context API for data management across components. 
-    basically to show data in to the cart screen 
-    */
-    const {state,addToCart,removeFromCart} = useContext(Context);
+*/
+const Custombutton = ({ dish, restid, restname, restimg }) => {
+    /* 
+    Use of context API for data management across components. 
+        basically to show data in to the cart screen 
+        */
+    const { state, addToCart, removeFromCart } = useContext(Context);
     //Variable for animating the Add Text
     const onClickAdd = useRef(new Animated.Value(0)).current;
 
-    // Variable for animating the Plus(+) icon from left to right
-    const PlusIcon = useRef(new Animated.Value(-30)).current;
-
-    // Variable for animating the Minus(-) icon from right to left
-    const MinusIcon = useRef(new Animated.Value(30)).current;
+    
 
     // item to be send as Payload to the dishContext,js file
-    const item = { 
+    const item = {
         restid,
         restname,
         restimg,
@@ -30,7 +26,26 @@ Use of context API for data management across components.
         quantity: 1
     }
 
-    const [count,setcount] = useState(0);
+    const [count, setcount] = useState(0);
+    const checkCount = () => {
+        state.map((data) => {
+            if (data.restid === item.restid && data.dish.name === item.dish.name) {
+                if(data.quantity !== count)
+                    {
+                        addMovesDown();
+                        setTimeout(() => {
+                            setcount(data.quantity);
+                        }, 500);
+                    }
+            }
+        });
+    }
+    useEffect(() => {
+        checkCount();
+        if(!state.find(item => item.dish.name === dish.name) && count)
+            setcount(0);
+
+    }, [state]);
 
     // Animation function for moving the add button down
     const addMovesDown = () => {
@@ -47,29 +62,13 @@ Use of context API for data management across components.
         });
     }
 
-    //Animation function for moving the Plus(+) icon
-    const plusMovesRight = () => {
-        Animated.timing(PlusIcon, {
-            toValue: 0,
-            duration: 600,
-            useNativeDriver: true
-        }).start();
-    }
 
-     //Animation function for moving the Minus(-) icon
-    const minusMovesLeft = () => {
-        Animated.timing(MinusIcon, {
-            toValue: 0,
-            duration: 600,
-            useNativeDriver: true
-        }).start()
-    }
 
- 
- /* 
- Displays ADD when Count variable is zero, and for count > 0 
- it displays - {count} + button
-  */
+
+    /* 
+    Displays ADD when Count variable is zero, and for count > 0 
+    it displays - {count} + button
+     */
     return (
         count === 0 ?
             <View style={[styles.addcontainer, {
@@ -77,15 +76,13 @@ Use of context API for data management across components.
             }
             ]}>
                 <TouchableOpacity onPress={() => {
-                    
+
                     addToCart(item);
                     addMovesDown();
-                    plusMovesRight();
-                    minusMovesLeft();
                     setTimeout(() => {
-                        setcount(count+1);
-                    }, 500); 
-                    
+                        setcount(count + 1);
+                    }, 500);
+
 
                 }}>
                     <Animated.Text style={[{
@@ -100,20 +97,12 @@ Use of context API for data management across components.
             </View> :
             <View style={styles.container}>
                 <TouchableOpacity onPress={() => {
-                    setcount(count-1);
+                    setcount(count - 1);
                     removeFromCart(item);
                 }} style={styles.iconStyle}>
-                    <Animated.View style={[
-                        {
-                            transform: [
-                                {
-                                    translateX: MinusIcon
-                                }
-                            ]
-                        }
-                    ]}>
+                    <View>
                         <Feather name='minus' size={20} color="#4DC9FF" />
-                    </Animated.View>
+                    </View>
                 </TouchableOpacity>
                 <Animated.Text style={[styles.counterStyle,
                 {
@@ -124,21 +113,13 @@ Use of context API for data management across components.
                     ]
                 }]}>{count}</Animated.Text>
                 <TouchableOpacity onPress={() => {
-                    setcount(count+1);
-    
+                    setcount(count + 1);
+
                     addToCart(item)
                 }} style={styles.iconStyle}>
-                    <Animated.View style={[
-                        {
-                            transform: [
-                                {
-                                    translateX: PlusIcon
-                                }
-                            ]
-                        }
-                    ]}>
+                    <View>
                         <MaterialIcons name='add' size={20} color='#4DC9FF' />
-                    </Animated.View>
+                    </View>
                 </TouchableOpacity>
             </View>
     )
