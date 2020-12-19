@@ -1,3 +1,3 @@
-const Server = 'http://677b043e0bea.ngrok.io';
+const Server = 'http://82852b9aef75.ngrok.io';
 
 export default Server;

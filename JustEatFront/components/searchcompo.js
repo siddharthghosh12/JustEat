@@ -1,32 +1,46 @@
 import React from 'react';
-import { StyleSheet,View,TextInput } from 'react-native';
-import { EvilIcons } from '@expo/vector-icons';
+import { View, StyleSheet, Text, FlatList, TouchableOpacity } from 'react-native';
+import Display from './Searchresult';
+import {Entypo} from '@expo/vector-icons';
+import {useNavigation} from '@react-navigation/native'
+
+const Displaylist = ({ restdetail }) => {
+    const navigation = useNavigation();
 
 
-const Searchcompo = ({term,onTermChange,onTermSubmit}) => {
-    return(
-        <View style={styles.background}>
-            <EvilIcons name="search" size={40} color='#4dc9ff' />
-            <TextInput style={styles.InputStyle} placeholder="Search" value={term} 
-                onChangeText={newTerm => onTermChange(newTerm)} autoCapitalize="none"
-                autoCorrect={false} onEndEditing={(term) => onTermSubmit(term)}  />
+    return (
+        <View style={styles.container}>
+            <TouchableOpacity style={styles.indistyle} onPress={() => navigation.navigate('Details', { id : restdetail.restid })}>
+                <Text style={styles.resttitle}>{restdetail.name}</Text>
+                <Entypo name='chevron-with-circle-right' size={20} color='#4dc9ff' style={{alignSelf:'center',margin:10}} />
+            </TouchableOpacity>
+            <FlatList
+                data={restdetail.dishes}
+                keyExtractor={dish => dish.name}
+                renderItem={({ item }) => {
+                    return <Display item={item} restname={restdetail.name} restid={restdetail.restid} rest_img={restdetail.rest_img} />
+                }} />
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    background : {
-        height: 35,
-        borderRadius: 5,
-        marginHorizontal:15,
-        flexDirection:"row",
-        borderWidth:1,
-        borderColor:'#4dc9ff'
+    resttitle: {
+        fontSize: 17,
+        fontWeight: 'bold',
+        marginLeft:5,
+        marginTop:10
     },
-    InputStyle : {
-        flex:1,
-        marginLeft:5
+    container:{
+        margin:10,
+        elevation:1,
+        borderRadius:2
+
+    },
+    indistyle:{
+        flexDirection:'row',
+        justifyContent:'space-between'
     }
 });
 
-export default Searchcompo;
+export default Displaylist;
