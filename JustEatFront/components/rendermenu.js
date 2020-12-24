@@ -3,22 +3,12 @@ import { Text, View, ImageBackground, StyleSheet, TouchableOpacity } from 'react
 import { Divider } from 'react-native-elements';
 import { FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
 import Server from '../server';
-import { useNavigation } from '@react-navigation/native'
-import Custombutton from './custombutton'; 
+import Custombutton from './DisplayButton'; 
 
 
-const Rendermenu = ({ res,restid,restname,restimg }) => {
-    const navigation = useNavigation();
+const Rendermenu = ({ res,id,name,img }) => {
     const server = Server;
     const feature = res.bestSeller || res.mustTry;
-
-   
-
-
-
-
-
-
 
     return (
         <View>
@@ -40,7 +30,7 @@ const Rendermenu = ({ res,restid,restname,restimg }) => {
                 <View>
                     <ImageBackground style={styles.imgstyle}
                         source={{ uri: `${server}/${res.image}` }} >
-                        <Custombutton  dish={res} restid={restid} restname={restname} restimg={restimg} />
+                        <Custombutton  dish={res} restid={id} restname={name} restimg={img} />
                     </ImageBackground>
                 </View>
             </View>

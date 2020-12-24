@@ -17,11 +17,16 @@ const RestResultcompo = ({ title }) => {
     const navigation = useNavigation();
 
     useEffect(() => {
-        (async () => {
-            const response = await dishapi.get('/restaurants');
-            setresult(response.data);
-            setload(false);
-        })();
+        let mounted = true;
+        if(mounted)
+            {
+                (async () => {
+                    const response = await dishapi.get('/restaurants');
+                    setresult(response.data);
+                    setload(false);
+                })();
+            }
+        return () => mounted=false;
     }, [])
 
     const img_name = 'icon.jpg';

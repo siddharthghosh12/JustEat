@@ -15,7 +15,7 @@ const Custombutton = ({ dish, restid, restname, restimg }) => {
     //Variable for animating the Add Text
     const onClickAdd = useRef(new Animated.Value(0)).current;
 
-    
+
 
     // item to be send as Payload to the dishContext,js file
     const item = {
@@ -30,20 +30,21 @@ const Custombutton = ({ dish, restid, restname, restimg }) => {
     const checkCount = () => {
         state.map((data) => {
             if (data.restid === item.restid && data.dish.name === item.dish.name) {
-                if(data.quantity !== count)
-                    {
-                        addMovesDown();
-                        setTimeout(() => {
-                            setcount(data.quantity);
-                        }, 500);
-                    }
+                if (data.quantity !== count) {
+                    setcount(data.quantity);
+                }
             }
         });
     }
     useEffect(() => {
-        checkCount();
-        if(!state.find(item => item.dish.name === dish.name) && count)
-            setcount(0);
+        let mounted = true;
+        if (mounted) {
+            checkCount();
+            if (!state.find(item => item.dish.name === dish.name) && count)
+                setcount(0);
+        }
+
+        return () => mounted = false;
 
     }, [state]);
 
@@ -76,14 +77,9 @@ const Custombutton = ({ dish, restid, restname, restimg }) => {
             }
             ]}>
                 <TouchableOpacity onPress={() => {
-
+                    setcount(count+1)
                     addToCart(item);
                     addMovesDown();
-                    setTimeout(() => {
-                        setcount(count + 1);
-                    }, 500);
-
-
                 }}>
                     <Animated.Text style={[{
                         color: '#4DC9FF',
@@ -113,8 +109,7 @@ const Custombutton = ({ dish, restid, restname, restimg }) => {
                     ]
                 }]}>{count}</Animated.Text>
                 <TouchableOpacity onPress={() => {
-                    setcount(count + 1);
-
+                    setcount(count + 1)
                     addToCart(item)
                 }} style={styles.iconStyle}>
                     <View>

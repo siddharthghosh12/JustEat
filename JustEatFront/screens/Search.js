@@ -102,7 +102,7 @@ const SearchScreen = () => {
                 search.length && term ?
                     <FlatList
                     data={search}
-                    keyExtractor={res => res.name}
+                    keyExtractor={res => res.restid}
                     renderItem={({item}) => {
                        // console.log('ITEM',item);
                         return <Displaylist restdetail={item} />

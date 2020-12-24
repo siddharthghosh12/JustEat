@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Text, Image } from 'react-native';
 import Server from '../server';
-import Custombutton from './custombutton';
+import Custombutton from './DisplayButton';
 
 const Display = ({ item, restname, restid, rest_img }) => {
   /*  console.log('dish',item);

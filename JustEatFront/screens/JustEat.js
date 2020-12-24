@@ -51,8 +51,8 @@ const JustEatScreen = () => {
                 }
 
 
-                return focused ? <MaterialCommunityIcons name="food-apple" size={20} color="#4DC9FF" />
-                    : <MaterialCommunityIcons name="food-apple-outline" size={20} color="black" />
+                return focused ? <MaterialCommunityIcons name="alpha-j-circle" size={25} color="#4DC9FF" />
+                    : <MaterialCommunityIcons name='alpha-j-circle-outline' size={25} color="black" />
             }
         })} >
             <MainTab.Screen name="JUSTEAT" component={homeScreen}   />

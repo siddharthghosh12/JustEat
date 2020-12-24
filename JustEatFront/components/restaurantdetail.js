@@ -1,21 +1,24 @@
-import React from 'react';
+import React,{useMemo} from 'react';
 import { Text,StyleSheet,View,FlatList } from 'react-native';
 import Rendermenu from './rendermenu';
 
 
-const Restdetail = ({title,items,restname,restid,restimg}) => {
+const Restdetail = ({items,restname,restid,restimg}) => {
 
+    const renderItem = ({item}) => {
+        return <Rendermenu res={item} id={restid} name={restname} img={restimg}/>
+    }
+
+    const Memoval = useMemo(() => renderItem,[items])
+    
     return(
         <View style={styles.container}>
-            <Text style={styles.titleStyle}>{title}</Text>
+            <Text style={styles.titleStyle}>{items.title}</Text>
             <FlatList 
-            data={items}
+            data={items.dishes}
             keyExtractor={result => result.image}
-            initialNumToRender={30}
-            renderItem={({item}) => { 
-                //console.log(item.name);
-               return <Rendermenu res={item} restid={restid} restname={restname} restimg={restimg}/>
-            }} />
+            listKey={(item,index) => 'D' + index.toString()}
+            renderItem={Memoval} />
         </View>
     );
 }
