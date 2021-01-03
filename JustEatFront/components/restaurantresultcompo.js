@@ -16,15 +16,18 @@ const RestResultcompo = ({ title }) => {
     const [load, setload] = useState(true);
     const navigation = useNavigation();
 
+    const get_restaurants = async() => {
+        let response = await dishapi.get('/restaurants');
+        setresult(response.data);
+        setload(false);
+    }
+
+
     useEffect(() => {
         let mounted = true;
         if(mounted)
             {
-                (async () => {
-                    const response = await dishapi.get('/restaurants');
-                    setresult(response.data);
-                    setload(false);
-                })();
+                get_restaurants();
             }
         return () => mounted=false;
     }, [])
