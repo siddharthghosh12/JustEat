@@ -39,10 +39,15 @@ const OtpVerifyScreen = ({ phone, switch_off_modal }) => {
 
             if (otp_res.status === 200) {
                 setreq_status('Success');
-                await AsyncStorage.mergeItem('user', JSON.stringify({ token: otp_res.data.token }));
+                let token_obj = {
+                    token:otp_res.data.token
+                }
+                await AsyncStorage.mergeItem('user', JSON.stringify(token_obj));
 
                 let user_state = await AsyncStorage.getItem('user');
                 const user = JSON.parse(user_state);
+                console.log(token_obj);
+                console.log(user);
                 switch_off_modal();
                 Login(user);
                 return ;

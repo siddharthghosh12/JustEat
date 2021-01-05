@@ -8,9 +8,9 @@ const userReducer = (state,action) => {
     switch(action.type)
     {
         case "LOGIN_USER":
-            return {...initailState,user:action.payload}
+            return {...state,user:action.payload}
         case "LOGOUT_USER":
-            return {...initailState,user:null}
+            return {...state,user:null}
         default:
             return state;
     }
@@ -29,4 +29,4 @@ const Logout = (dispatch) => {
     }
 }
 
-export const {Context,Provider} = createDataContext(userReducer,{Login},initailState.user)
+export const {Context,Provider} = createDataContext(userReducer,{Login,Logout},initailState)

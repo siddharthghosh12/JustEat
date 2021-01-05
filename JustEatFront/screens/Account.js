@@ -13,12 +13,12 @@ import { AntDesign } from '@expo/vector-icons';
 const screen_width = Dimensions.get('screen').width;
 const AccountScreen = () => {
 
-    const { state } = useContext(Context);
+    const { state,Logout } = useContext(Context);
     const [modalvisible, setModalvisible] = useState(false);
     const acc_icon = 'account.png';
     //console.log(state);
     return (
-        state === null ?
+        state?.user === null ?
             <View style={styles.container}>
                 <Image source={{ uri: `${Server}/images/${acc_icon}` }} style={styles.image} />
                 <Text style={styles.heading}>ACCOUNT</Text>
@@ -35,6 +35,7 @@ const AccountScreen = () => {
                     </View>
                 </Modal>
                 <Divider style={{ margin: 20, height: 2, backgroundColor: '#4dc9ff' }} />
+                <Managecompo iconname='ios-mail' title='Send Feedback' />
             </View> :
             <View style={styles.account_container}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -58,7 +59,7 @@ const AccountScreen = () => {
                 </View>
                 <Ordercompo />
                 <Border height={20} />
-                <TouchableOpacity style={styles.logout_cont}>
+                <TouchableOpacity style={styles.logout_cont} onPress={() => Logout()}>
                     <Text style={[styles.heading,{marginTop:15}]}>Logout</Text>
                     <AntDesign name='poweroff' size={20} color='black' style={{margin:15}} />
                 </TouchableOpacity>

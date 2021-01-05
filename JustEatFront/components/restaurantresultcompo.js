@@ -11,6 +11,7 @@ import { useNavigation } from '@react-navigation/native';
 
 
 
+
 const RestResultcompo = ({ title }) => {
     const [result, setresult] = useState([]);
     const [load, setload] = useState(true);
