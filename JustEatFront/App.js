@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext,useRef } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { Text, View, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { NavigationContainer, DefaultTheme, getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { SearchBar } from 'react-native-elements';
@@ -24,8 +24,9 @@ navTheme.colors.background = '#FFFFFF';
 function App() {
   const [touched, setouched] = useState(false);
   const [touch, settouch] = useState(false);
-  const [first_launch, setFirst_launch] = useState(true);
-  const { Login } = useContext(Context)
+  const [first_launch, setFirst_launch] = useState(false);
+  const { Login, state } = useContext(Context)
+  let move_to_maps = useRef(false);
 
 
   const Currentval = new Animated.Value(1);
@@ -33,47 +34,44 @@ function App() {
 
   const Check_token = () => {
     AsyncStorage.getItem('user')
-    .then((user) => {
-      if (user !== null) {
-        let user_state = JSON.parse(user);
-        if (user_state.token !== null) {
-          Login(user_state)
+      .then((user) => {
+        if (user !== null) {
+          let user_state = JSON.parse(user);
+          if (user_state.token !== null) {
+            Login(user_state)
+          }
         }
-      }
-    })
-    .catch(err => console.log(err))
+      })
+      .catch(err => console.log(err))
   }
 
   const check_first_Launch = () => {
-    AsyncStorage.removeItem('first');
+   // AsyncStorage.removeItem('first');
     AsyncStorage.getItem('first')
       .then((val) => {
-        if(val === null)
-        {
-          AsyncStorage.setItem('first',JSON.stringify({first_launch:true}));
-        }
-        else{
-          setFirst_launch(false);
+        if (val === null) {
+          AsyncStorage.setItem('first', JSON.stringify({ first_launch: true }));
+          move_to_maps.current = true;
+          setFirst_launch(true);
         }
       })
       .catch(e => console.log(e));
   }
 
   useEffect(() => {
-    if(!first_launch)
-    {
-      RootNavigtion.navigate('Maps');
+    if (!first_launch) {
+      if (move_to_maps.current)
+        RootNavigtion.navigate('Maps');
     }
-  },[first_launch])
+  }, [first_launch])
 
   useEffect(() => {
     let mounted = true;
-    if(mounted)
-      {
-        Check_token();
-        check_first_Launch();
-      }
-    return () => mounted=false;
+    if (mounted) {
+      Check_token();
+      check_first_Launch();
+    }
+    return () => mounted = false;
   }, []);
 
   useEffect(() => {
@@ -81,7 +79,7 @@ function App() {
       TriggerAnimation()
   }, [touched]);
 
- 
+
   const getHeader = (route) => {
     const routename = getFocusedRouteNameFromRoute(route) ?? 'JUSTEAT';
 
@@ -157,9 +155,9 @@ function App() {
   return (
     first_launch === true ?
 
-        <Launch_carousel state={first_launch} close_state={() => setFirst_launch(false)} 
+      <Launch_carousel state={first_launch} close_state={() => setFirst_launch(false)}
         navigate_to_maps={() => RootNavigtion.navigate('Maps')}
-        />
+      />
       :
       <NavigationContainer
         theme={navTheme} ref={RootNavigtion.Navigation_ref}  >
