@@ -1,14 +1,12 @@
 import React from 'react';
 import {Image,StyleSheet} from 'react-native';
-import Server from '../server';
 
 
 const BottomImage = () => {
-    const server = Server;
-    const img_name = 'icon.jpg';
+
 
     return(
-        <Image style={styles.img} source={{uri:`${server}/images/${img_name}`}} />
+        <Image style={styles.img} source={require('../assets/icon.jpg')} />
     );
 }
 

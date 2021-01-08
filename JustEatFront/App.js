@@ -1,13 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext,useRef } from 'react';
 import { Text, View, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { NavigationContainer, DefaultTheme, getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { SearchBar } from 'react-native-elements';
 import JustEatScreen from './screens/JustEat';
 import DetailsScreen from './screens/detailsscreen';
+import Mapscreen from './screens/Mapscreen';
+import Launch_carousel from './FirstLaunch';
+import * as RootNavigtion from './RootNavigator';
 import { createStackNavigator } from '@react-navigation/stack';
 import { FontAwesome, MaterialCommunityIcons, Feather } from '@expo/vector-icons';
 import { Provider } from './Context/dishContext';
-import { Provider as UserProvider } from './Context/userContext';
+import { Provider as UserProvider, Context } from './Context/userContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 
@@ -15,21 +19,69 @@ import { Provider as UserProvider } from './Context/userContext';
 const HomeStack = createStackNavigator();
 
 const navTheme = DefaultTheme;
-navTheme.colors.background = '#FFFFFF'
+navTheme.colors.background = '#FFFFFF';
 
 function App() {
   const [touched, setouched] = useState(false);
   const [touch, settouch] = useState(false);
-  const [term, setterm] = useState('');
+  const [first_launch, setFirst_launch] = useState(true);
+  const { Login } = useContext(Context)
+
 
   const Currentval = new Animated.Value(1);
   const Animateheart = Animated.createAnimatedComponent(FontAwesome);
+
+  const Check_token = () => {
+    AsyncStorage.getItem('user')
+    .then((user) => {
+      if (user !== null) {
+        let user_state = JSON.parse(user);
+        if (user_state.token !== null) {
+          Login(user_state)
+        }
+      }
+    })
+    .catch(err => console.log(err))
+  }
+
+  const check_first_Launch = () => {
+    AsyncStorage.removeItem('first');
+    AsyncStorage.getItem('first')
+      .then((val) => {
+        if(val === null)
+        {
+          AsyncStorage.setItem('first',JSON.stringify({first_launch:true}));
+        }
+        else{
+          setFirst_launch(false);
+        }
+      })
+      .catch(e => console.log(e));
+  }
+
+  useEffect(() => {
+    if(!first_launch)
+    {
+      RootNavigtion.navigate('Maps');
+    }
+  },[first_launch])
+
+  useEffect(() => {
+    let mounted = true;
+    if(mounted)
+      {
+        Check_token();
+        check_first_Launch();
+      }
+    return () => mounted=false;
+  }, []);
 
   useEffect(() => {
     if (touched)
       TriggerAnimation()
   }, [touched]);
 
+ 
   const getHeader = (route) => {
     const routename = getFocusedRouteNameFromRoute(route) ?? 'JUSTEAT';
 
@@ -61,10 +113,10 @@ function App() {
   }
   const Title = () => {
     return (
-      <View style={styles.container}>
+      <TouchableOpacity style={styles.container} onPress={() => RootNavigtion.navigate('Maps')}>
         <FontAwesome name="map-marker" size={30} color="#4DC9FF" />
         <Text style={styles.TextStyle}>Your Address</Text>
-      </View>
+      </TouchableOpacity>
 
     );
   }
@@ -103,22 +155,29 @@ function App() {
   }
 
   return (
-    <NavigationContainer
-      theme={navTheme}  >
-      <HomeStack.Navigator
-      >
-        <HomeStack.Screen name='JustEat' component={JustEatScreen}
-          options={({ route }) => ({
-            headerShown: getHeader(route) === 'JUSTEAT' ? true : false,
-            headerTitle: props => <Title {...props} />,
-            headerRight: props => <Right {...props} />
-          })
-          }
+    first_launch === true ?
+
+        <Launch_carousel state={first_launch} close_state={() => setFirst_launch(false)} 
+        navigate_to_maps={() => RootNavigtion.navigate('Maps')}
         />
-        <HomeStack.Screen name='Details' component={DetailsScreen}
-          options={{ headerRight: props => <Detailsheader {...props} /> }} />
-      </HomeStack.Navigator>
-    </NavigationContainer>
+      :
+      <NavigationContainer
+        theme={navTheme} ref={RootNavigtion.Navigation_ref}  >
+        <HomeStack.Navigator
+        >
+          <HomeStack.Screen name='JustEat' component={JustEatScreen}
+            options={({ route }) => ({
+              headerShown: getHeader(route) === 'JUSTEAT' ? true : false,
+              headerTitle: props => <Title {...props} />,
+              headerRight: props => <Right {...props} />
+            })
+            }
+          />
+          <HomeStack.Screen name='Details' component={DetailsScreen}
+            options={{ headerRight: props => <Detailsheader {...props} /> }} />
+          <HomeStack.Screen name='Maps' component={Mapscreen} />
+        </HomeStack.Navigator>
+      </NavigationContainer>
 
   );
 }

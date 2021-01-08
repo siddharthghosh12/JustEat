@@ -113,7 +113,7 @@ const Loginform = ({ closeModal }) => {
                         </View>
                         :
                         <View>
-                            <ImageBackground source={{ uri: `${Server}/images/${login_img}` }} style={styles.img} />
+                            <ImageBackground source={require('../assets/Vegrole.jpg')} style={styles.img} />
                             {
                                 loginform === true ?
                                     <View style={styles.container} >

@@ -17,20 +17,20 @@ const RestResultcompo = ({ title }) => {
     const [load, setload] = useState(true);
     const navigation = useNavigation();
 
-    const get_restaurants = async() => {
-        let response = await dishapi.get('/restaurants');
-        setresult(response.data);
-        setload(false);
-    }
-
+   
 
     useEffect(() => {
         let mounted = true;
-        if(mounted)
+        (async ()=> {
+            let response = await dishapi.get('/restaurants');
+            if(mounted)
             {
-                get_restaurants();
+                setresult(response.data);
+                setload(false)
             }
-        return () => mounted=false;
+        })();
+
+        return () => mounted = false;
     }, [])
 
     const img_name = 'icon.jpg';
@@ -75,7 +75,7 @@ const RestResultcompo = ({ title }) => {
                 ListFooterComponent={footercompo}
                 onEndReachedThreshold={0.5}
                 renderItem={({ item }) => {
-                    
+
                     return (
                         <TouchableOpacity onPress={() => navigation.navigate('Details', { id: item._id })} >
                             <Displaycompo result={item} />

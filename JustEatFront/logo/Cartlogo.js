@@ -1,15 +1,12 @@
 import React from 'react';
 import {View,Image,StyleSheet} from 'react-native';
-import Server from '../server';
 
 
 const Cartlogo = () => {
-    const server = Server;
-    const img_name = 'Cart.png'
 
     return(
         <View>
-            <Image source={{uri:`${server}/images/${img_name}`}} style={styles.img} />
+            <Image source={require('../assets/Cart.png')} style={styles.img} />
         </View>
     );
 } 

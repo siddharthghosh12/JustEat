@@ -99,7 +99,7 @@ const SearchScreen = () => {
                     onKeyPress={() => fun()} />
             </View>
             {
-                search.length && term ?
+                search.length!==0  ?
                     <FlatList
                     data={search}
                     keyExtractor={res => res.restid}

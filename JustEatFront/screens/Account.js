@@ -20,7 +20,7 @@ const AccountScreen = () => {
     return (
         state?.user === null ?
             <View style={styles.container}>
-                <Image source={{ uri: `${Server}/images/${acc_icon}` }} style={styles.image} />
+                <Image source={require('../assets/account.png')} style={styles.image} />
                 <Text style={styles.heading}>ACCOUNT</Text>
                 <Text style={styles.Text}>Login/Create Account to fill your tummy</Text>
                 <Button title='Login' buttonStyle={{ width: 200, alignSelf: 'center', borderColor: '#4dc9ff' }}
