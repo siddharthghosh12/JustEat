@@ -36,10 +36,6 @@ const RestResultcompo = ({ title }) => {
     const img_name = 'icon.jpg';
     const headercompo = () => {
         return (
-            load ?
-                <View style={styles.loadcont}>
-                    <ActivityIndicator size="large" color='#4DC9FF' />
-                </View> :
                 <View>
                     <Dishresultcompo title="Top Picks For You" />
                     <Border height={5} />
@@ -53,8 +49,6 @@ const RestResultcompo = ({ title }) => {
 
     const footercompo = () => {
         return (
-            load ? <View></View>
-                :
                 <View>
                     <Button title="See All Restaurants"
                         type='solid' raised
@@ -67,6 +61,10 @@ const RestResultcompo = ({ title }) => {
 
 
     return (
+        load ?
+                <View style={styles.loadcont}>
+                    <ActivityIndicator size="large" color='#4DC9FF' />
+                </View> :
         <View style={{ flex: 1 }}>
             <FlatList
                 data={result}
@@ -107,9 +105,7 @@ const styles = StyleSheet.create({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        flex: 1,
-        borderWidth: 2,
-        borderColor: 'black'
+        flex: 1
     }
 });
 

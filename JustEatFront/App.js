@@ -46,7 +46,7 @@ function App() {
   }
 
   const check_first_Launch = () => {
-   // AsyncStorage.removeItem('first');
+    // AsyncStorage.removeItem('first');
     AsyncStorage.getItem('first')
       .then((val) => {
         if (val === null) {
@@ -112,8 +112,23 @@ function App() {
   const Title = () => {
     return (
       <TouchableOpacity style={styles.container} onPress={() => RootNavigtion.navigate('Maps')}>
-        <FontAwesome name="map-marker" size={30} color="#4DC9FF" />
-        <Text style={styles.TextStyle}>Your Address</Text>
+        <FontAwesome name="home" size={30} color="#4DC9FF" style={{alignSelf:'center'}}/>
+        {
+          state?.user?.address.map((item, index) => {
+            return (
+              <View key={index}>
+                {
+                  item.save_as_current === true ?
+                    <View>
+                      <Text style={styles.address_text}>{item.title}</Text>
+                      <Text style={{color:'#a9a9a9',marginLeft:10}}>{item.address}</Text>
+                    </View>
+                    : null
+                }
+              </View>
+            );
+          })
+        }
       </TouchableOpacity>
 
     );
@@ -173,7 +188,9 @@ function App() {
           />
           <HomeStack.Screen name='Details' component={DetailsScreen}
             options={{ headerRight: props => <Detailsheader {...props} /> }} />
-          <HomeStack.Screen name='Maps' component={Mapscreen} />
+          <HomeStack.Screen name='Maps' component={Mapscreen}
+            options={{ headerShown: false }}
+          />
         </HomeStack.Navigator>
       </NavigationContainer>
 
@@ -205,6 +222,12 @@ const styles = StyleSheet.create({
     flex: 1,
     marginTop: 40,
     backgroundColor: '#F0EEEE'
+  },
+  address_text: {
+    marginLeft: 10,
+    fontWeight: 'bold',
+    fontSize: 15,
+    alignItems: 'center'
   }
 });
 /*

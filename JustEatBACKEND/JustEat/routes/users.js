@@ -139,6 +139,28 @@ userRouter.post('/verifyotp',(req,res,next) => {
 })
 
 
+userRouter.post('/save_address',(req,res,next) => {
+  const phone = String(req.body.Phone).replace(/[^\d]/g,'');
+  Users.findOne({Phone:phone})
+    .then((user) => {
+      console.log(user);
+      user.Address.push({
+        title:req.body.title,
+        address:req.body.address
+      });
+      user.save((err,user) => {
+        if(err)
+          return res.status(422).send({error:err})
+        else{
+          res.statusCode =200;
+          res.setHeader('Content-Type','application/json')
+          res.send({success:true});
+        }
+      })
+    })
+    .catch(err => console.log(err));
+})
+
 
 module.exports = userRouter;
 

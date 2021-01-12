@@ -36,6 +36,10 @@ const orderSchema = new Schema({
 });
 
 const addressSchema = new Schema({
+    title:{
+        type:String,
+        default:''
+    },
     address:{
         type:String,
         default:''

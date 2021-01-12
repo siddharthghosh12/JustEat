@@ -15,8 +15,8 @@ const AccountScreen = () => {
 
     const { state,Logout } = useContext(Context);
     const [modalvisible, setModalvisible] = useState(false);
-    const acc_icon = 'account.png';
-    //console.log(state);
+
+    
     return (
         state?.user === null ?
             <View style={styles.container}>
