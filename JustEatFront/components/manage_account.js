@@ -5,18 +5,18 @@ import { FontAwesome, Ionicons } from '@expo/vector-icons'
 
 
 
-
+// Displays a Touchable component for various items on the account screen 
 const Managecompo = ({ iconname, title }) => {
     return (
         <View>
             <View style={styles.container}>
                 <View style={{ flexDirection: 'row' }}>
-                    {title === 'Send Feedback' ? <Ionicons name={iconname} size={30} color='#4dc9ff' /> :
-                        <FontAwesome name={iconname} size={25} color='#4dc9ff' />}
+                    {title === 'Send Feedback' ? <Ionicons name={iconname} size={25} color='black' /> :
+                        <FontAwesome name={iconname} size={25} color='black' />}
                     <Text style={styles.Text}>{title}</Text>
                 </View>
                 <TouchableOpacity>
-                    <Ionicons name='ios-arrow-dropright' size={30} color='#4dc9ff' />
+                    <Ionicons name='ios-arrow-dropright' size={25} color='black' />
                 </TouchableOpacity>
             </View>
             <Divider />
@@ -32,8 +32,8 @@ const styles = StyleSheet.create({
     },
     Text: {
         fontWeight: 'bold',
-        fontSize: 18,
-        color: '#a9a9a9',
+        fontSize: 16,
+        color: '#4dc9ff',
         marginLeft: 15
     }
 });

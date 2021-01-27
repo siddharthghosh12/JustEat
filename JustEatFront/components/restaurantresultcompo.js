@@ -11,14 +11,18 @@ import { useNavigation } from '@react-navigation/native';
 
 
 
-
+// This is the homeScreencompo which  shows a list of restaurants as well as dishes
 const RestResultcompo = ({ title }) => {
+
+    // Various state params to maintain display
     const [result, setresult] = useState([]);
     const [load, setload] = useState(true);
+
+    // For navigation to details screen
     const navigation = useNavigation();
 
    
-
+    // gets the list of restaurants the when the screen loads for the first time
     useEffect(() => {
         let mounted = true;
         (async ()=> {
@@ -34,6 +38,7 @@ const RestResultcompo = ({ title }) => {
     }, [])
 
     const img_name = 'icon.jpg';
+    // header component of flatlist displaying the list of top dishes
     const headercompo = () => {
         return (
                 <View>
@@ -47,6 +52,7 @@ const RestResultcompo = ({ title }) => {
         );
     }
 
+    // footer cmoponent to display a button and bottom_image
     const footercompo = () => {
         return (
                 <View>
@@ -63,7 +69,7 @@ const RestResultcompo = ({ title }) => {
     return (
         load ?
                 <View style={styles.loadcont}>
-                    <ActivityIndicator size="large" color='#4DC9FF' />
+                   <Image source={require('../assets/animation.gif')} style={{width:100,height:100}} />
                 </View> :
         <View style={{ flex: 1 }}>
             <FlatList

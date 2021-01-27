@@ -3,10 +3,17 @@ import { View,Text,TouchableOpacity,StyleSheet } from 'react-native';
 import {FontAwesome,MaterialCommunityIcons,MaterialIcons,Feather} from '@expo/vector-icons';
 import {Context} from '../Context/dishContext';
 
-
+// Displays the list of items added to the Cart.
+// Provides functionality of adding and removing items itself from the cart screen 
 const Cartlist = ({result}) => {
+
+    // Functions to change the global state to add or remove dishes
     const {addToCart,removeFromCart} = useContext(Context);
+
+    // Total Price
     let Price = result.quantity*result.dish.Price;
+
+    
     return(
         <View style={{flexDirection:'row',margin:15,justifyContent:'space-between'}}>
             <View style={{flexDirection:'row',width:190,flexWrap:'wrap'}}>

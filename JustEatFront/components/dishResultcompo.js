@@ -4,10 +4,14 @@ import {FontAwesome} from '@expo/vector-icons';
 import  dishapi from '../api/dishapi';
 import Displaycompo from './displaycompofordishesinhomescr';
 
-
+// Displays the top recommended dishes to the user
+// TODO: Configure touches and wireUp dishes with respective canteens
 const Dishresultcompo = ({title}) => {
+
+    // To Store the list of dishes returned from the server
     const [result,setresult] = useState([]);
 
+    // Gets the list of dishes from the server as soon as the screen loads for the first time
     useEffect(() => {
         let mounted = true;
         (async () => {

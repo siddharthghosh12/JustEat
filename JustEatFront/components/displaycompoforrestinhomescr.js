@@ -3,9 +3,11 @@ import {View,Text,StyleSheet,Image} from 'react-native';
 import Server from '../server';
 import {FontAwesome,Entypo} from '@expo/vector-icons';
 
+
+// Displays a list of restaurants 
 const Displaycompo = ({result}) => {
     const server = Server;
-    //console.log(result.name);
+  
     return(
             <View style={styles.container}>
                 <Image style={styles.imgstyle} source={{uri:`${server}/${result.image}`}}/>

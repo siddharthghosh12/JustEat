@@ -1,18 +1,23 @@
 import createDataContext from '../createDatacontext';
 
-
+// Reducer function handling various state changes depending upon action.TYPE
 const dishReducer = (state,action) => {
-   // console.log('Action.payload>>>>',action.payload)
+   
     switch(action.type)
     {
+        // Function  to add dishes to the Cart
         case 'ADD_TO_CART':
+            /*
+                Checks if the dish already exists or not, it doesn't exist then add it to the cart.
+            */
            if(!state.find(item => item.dish.name === action.payload.dish.name && item.restid === action.payload.restid))
-           {   /* console.log('--------------------------------------------------'); 
-               console.log('I am the new one');
-                console.log('--------------------------------------------------');
-                */
+           {  
                return [...state,action.payload]
            }
+           /*
+            if the dish already exists then map through the state, find that dish object and then 
+            increase its qunatity by 1 and return the state.
+           */
            else {
               
              return  state.map((item,index) =>{
@@ -30,6 +35,11 @@ const dishReducer = (state,action) => {
                    return item;
                }) 
            }
+           /*
+                Map through the state find the dish object sent in via action.PAYLOAD
+                and it its restId matches then reduce the quantity by one ,
+                and if its quantity is 1 then filter it.
+           */
         case 'REMOVE_FROM_CART':
             return  state.map((item,index) =>{
                 if((item.dish.name !== action.payload.dish.name ))
@@ -56,7 +66,7 @@ const dishReducer = (state,action) => {
 }
 
 
-
+//Functions to dispatch actions
 const addToCart = (dispatch) => {
   return (item) => {
       dispatch({type:'ADD_TO_CART',payload:item});

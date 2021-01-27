@@ -4,19 +4,30 @@ import { Context } from '../Context/dishContext';
 import { FontAwesome, Feather, Entypo } from '@expo/vector-icons';
 import {useNavigation} from '@react-navigation/native'
 
-
+/*
+    Shows a BottomSheet as soon as something goes in to cart,
+    so that user can directly navigate from there to cart screen
+*/
 const BottomSheet = () => {
 
+    // Helps in providing a navigation function so that user can navigate
     const navigation = useNavigation();
+
+    // The global state which helps in state management across different components
     const { state } = useContext(Context);
     const Screenwidth = Dimensions.get('screen').width;
+
+    // Function to get the total price of items in the Cart
     const getTotalPrice = state.reduce((sum, item) => {
         return sum + item.quantity * item.dish.Price;
     }, 0);
+
+    // Function to get the total number of items in the cart
     const getTotalItems = state.reduce((sum, item) => {
         return sum + item.quantity;
     }, 0)
 
+    // Conditionally renders sheet whenever the cart has some items
     return (
         state.length > 0 ?
             <Animated.View style={[styles.BottomSheet, { width: Screenwidth },

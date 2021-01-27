@@ -1,15 +1,20 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Text, TextInput, ImageBackground, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, Text, TextInput, ImageBackground, TouchableOpacity, ScrollView, ActivityIndicator,KeyboardAvoidingView } from 'react-native';
 import { Button } from 'react-native-elements';
-import Server from '../server';
 import userapi from '../api/dishapi';
 import { SafeAreaView } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import OtpVerifyScreen from './otpform';
+import Loading_compo from './Loadingcompo';
+/*
+TODO: Configure the design of the login screen.
+      Add Loading animation.
+      
 
-
-const Loginform = ({ closeModal }) => {
-    const login_img = 'Veg role.jpg';
+*/
+// Displays a Login form on the screen
+const Loginform = () => {
+    
+    // Various params to check user_info and validate for network requests
     const [username, setusername] = useState('');
     const [validname, setvalidname] = useState(true);
     const [email, setemail] = useState('');
@@ -20,23 +25,14 @@ const Loginform = ({ closeModal }) => {
     const [validmob, setvalidmob] = useState(true);
     const [loginform, setloginform] = useState(false);
     const [req_status, setreq_status] = useState('');
-    const [otp, setotp] = useState('');
     const [show_otp_screen, setshow_otp_screen] = useState(false);
 
 
-    const user_state = {
-        user: {
-            name: username,
-            email: email,
-            Phone: mobile,
-        },
-        address: [],
-        orders: [],
-        favourites: []
-    }
-
+    // Validation of mobile number of the user
     const checkMobile = () => {
         var mobre = /[\d]/g;
+
+        // checks if the mobile_No. field is not empty and of sufficient length
         if (mobre.test(mobile) && mobile.length === 10) {
             setvalidmob(true);
             return true;
@@ -44,8 +40,10 @@ const Loginform = ({ closeModal }) => {
         setvalidmob(false);
     }
 
+     // Validation of email of the user
     const checkemail = () => {
         var emailreg = email.split('@')[1];
+        // checks whether the user uses institute id or not
         if (emailreg !== 'itbhu.ac.in') {
             setvalidmail(false);
             return true;
@@ -54,6 +52,7 @@ const Loginform = ({ closeModal }) => {
         return false;
     }
 
+    // Validation of user_name
     const checkname = () => {
         if (username.length === 0) {
             setvalidname(false);
@@ -62,6 +61,7 @@ const Loginform = ({ closeModal }) => {
         setvalidname(true)
     }
 
+    // Password Validation
     const checkpass = () => {
         if (Password.length === 0) {
             setvalidpass(false);
@@ -70,9 +70,18 @@ const Loginform = ({ closeModal }) => {
         setvalidpass(true)
     }
 
+    // Function to register the user
     const handleCreate = async () => {
-        if (!validmail || !validmob || !validpass || !validname)
-            return false;
+
+        // checks whether all the params are valid or not
+        if (!validmail || !validmob || !validpass || !validname || username==='' || mobile==='' || email==='' || Password==='')
+            {
+                setreq_status('SignupInvalid')
+                return;
+            }
+            setreq_status('Loading');
+
+        // Makes request using async/await and handles the response accordingly
         const response = await userapi.post('/users/register', {
             email: email,
             name: username,
@@ -82,15 +91,19 @@ const Loginform = ({ closeModal }) => {
         if (response.status === 200) {
             setreq_status('Success');
             setloginform(true);
-            await AsyncStorage.setItem('user', JSON.stringify(user_state));
             return;
         }
         setreq_status('Failed');
     }
 
+    // function to login the user in to the application
     const handleLogin = async () => {
-        if (!validname || !validmail)
-            return false;
+        if (!validname || !validmob || username==='' || mobile==='')
+            {
+                setreq_status('LoginInvalid');
+                return;
+            }
+            setreq_status('Loading');
         let login_response = await userapi.post('/users/login', {
             Phone: '+91' + mobile
         });
@@ -101,19 +114,21 @@ const Loginform = ({ closeModal }) => {
         }
     }
 
+
+    // Renders different components depending upon the state and situation
     return (
         req_status === 'Loading' ? <View style={styles.loading_cont}>
-            <ActivityIndicator size='large' color='#4dc9ff' />
+           <Loading_compo />
         </View> :
             <SafeAreaView>
                 {
                     show_otp_screen === true ?
                         <View style={styles.loading_cont} >
-                                <OtpVerifyScreen phone={mobile} switch_off_modal={closeModal}/>
+                                <OtpVerifyScreen phone={mobile}/>
                         </View>
                         :
-                        <View>
-                            <ImageBackground source={require('../assets/Vegrole.jpg')} style={styles.img} />
+                        <ScrollView showsVerticalScrollIndicator={false}>
+                            <ImageBackground source={require('../assets/food1.png')} style={styles.img} />
                             {
                                 loginform === true ?
                                     <View style={styles.container} >
@@ -126,22 +141,20 @@ const Loginform = ({ closeModal }) => {
                                             </TouchableOpacity>
                                         </View>
                                         <Text style={styles.formtext}>Username</Text>
-                                        <TextInput placeholder='  Username' style={styles.input} value={username} placeholderTextColor='#d8f2ff'
+                                        <TextInput placeholder='Username' style={styles.input} value={username} placeholderTextColor='#a9a9a9'
                                             onChangeText={(term) => setusername(term)} />
                                         {!validname ? <Text style={{ color: 'red', marginLeft: 20 }}>Username should not be empty</Text> : null}
                                         <Text style={styles.formtext}>Mobile No.</Text>
-                                        <TextInput placeholder='  +91-1234567898' style={styles.input} value={mobile} placeholderTextColor='#d8f2ff'
+                                        <TextInput placeholder='+91-1234567898' style={styles.input} value={mobile} placeholderTextColor='#a9a9a9'
                                             onChangeText={(term) => setmobile(term)} onEndEditing={() => checkMobile()} />
                                         {!validmob && mobile.length !== 0 ? <Text style={{ color: 'red', marginLeft: 20 }}>Invalid number</Text> : null}
-                                        <Button title='Login' type='outline' containerStyle={{ marginTop: 20, marginHorizontal: 20 }} titleStyle={{ color: '#d2f8ff', fontWeight: 'bold' }}
-                                            buttonStyle={{ borderColor: '#4dc9ff' }} onPress={() => {
-                                                setreq_status('Loading');
+                                        <Button title='Login' type='solid' containerStyle={{ marginTop: 20, marginHorizontal: 20 }} titleStyle={{ color: '#d2f8ff', fontWeight: 'bold' }}
+                                            buttonStyle={{ backgroundColor: '#4dc9ff' }} onPress={() => {
                                                 handleLogin();
                                             }} />
-                                        <Button title='Cancel ' type='outline' containerStyle={{ margin: 20 }} titleStyle={{ color: '#d2f8ff', fontWeight: 'bold' }}
-                                            buttonStyle={{ borderColor: '#4dc9ff' }} onPress={closeModal} />
+                                         {req_status === 'LoginInvalid' ? <Text style={{ color: 'red', marginLeft: 20, fontSize: 18 }}>*One or more of the above input field is empty</Text> : null}
                                     </View> :
-                                    <ScrollView style={styles.container} >
+                                    <View style={styles.container} >
                                         <Text style={styles.heading}>Create an Account</Text>
                                         <View style={{ flexDirection: 'row', marginLeft: 20, marginBottom: 15 }}>
                                             <Text style={{ color: '#a9a9a9' }}>Or</Text>
@@ -150,32 +163,30 @@ const Loginform = ({ closeModal }) => {
                                             </TouchableOpacity>
                                         </View>
                                         <Text style={styles.formtext}>Username</Text>
-                                        <TextInput placeholder='  Username' style={styles.input} value={username} placeholderTextColor='#d8f2ff'
+                                        <TextInput placeholder='Username' style={styles.input} value={username} placeholderTextColor='#a9a9a9'
                                             onChangeText={(term) => setusername(term)} onEndEditing={() => checkname()} />
-                                        {!validname ? <Text style={{ color: 'red', marginLeft: 20 }}>Username should not be empty</Text> : null}
+                                        {!validname ? <Text style={{ color: 'red', marginLeft: 20 }}>*Username should not be empty</Text> : null}
                                         <Text style={styles.formtext}>EmailId</Text>
-                                        <TextInput placeholder='  example@itbhu.ac.in' style={!checkemail ? styles.err : styles.input} value={email} placeholderTextColor='#d8f2ff'
+                                        <TextInput placeholder='example@itbhu.ac.in' style={!checkemail ? styles.err : styles.input} value={email} placeholderTextColor='#a9a9a9'
                                             onChangeText={(term) => setemail(term)} onEndEditing={() => checkemail()} />
-                                        {!validmail && email.length !== 0 ? <Text style={{ color: 'red', marginLeft: 20 }}>You should only Login via your institute id</Text> : null}
+                                        {!validmail && email.length !== 0 ? <Text style={{ color: 'red', marginLeft: 20 }}>*You should only Login via your institute id</Text> : null}
                                         <Text style={styles.formtext}>Password</Text>
-                                        <TextInput placeholder=' ********' style={styles.input} value={Password} placeholderTextColor='#d8f2ff'
+                                        <TextInput placeholder='********' style={styles.input} value={Password} placeholderTextColor='#a9a9a9'
                                             onChangeText={(term) => setPassword(term)} secureTextEntry={true} onEndEditing={() => checkpass()} />
-                                        {!validpass ? <Text style={{ color: 'red', marginLeft: 20 }}>Password should not be empty</Text> : null}
+                                        {!validpass ? <Text style={{ color: 'red', marginLeft: 20 }}>*Password should not be empty</Text> : null}
                                         <Text style={styles.formtext}>Mobile No.</Text>
-                                        <TextInput placeholder='  +91-1234567898' style={styles.input} value={mobile} placeholderTextColor='#d8f2ff'
+                                        <TextInput placeholder='+91-1234567898' style={styles.input} value={mobile} placeholderTextColor='#a9a9a9'
                                             onChangeText={(term) => setmobile(term)} onEndEditing={() => checkMobile()} />
-                                        {!validmob && mobile.length !== 0 ? <Text style={{ color: 'red', marginLeft: 20 }}>Invalid number</Text> : null}
-                                        <Button title='Create Account' type='outline' containerStyle={{ marginTop: 20, marginHorizontal: 20 }} titleStyle={{ color: '#d2f8ff', fontWeight: 'bold' }}
-                                            buttonStyle={{ borderColor: '#4dc9ff' }} onPress={() => {
+                                        {!validmob && mobile.length !== 0 ? <Text style={{ color: 'red', marginLeft: 20 }}>*Invalid number</Text> : null}
+                                        {req_status === 'SignupInvalid' ? <Text style={{ color: 'red', marginLeft: 20, fontSize: 14,marginVertical:10 }}>*One or more of the above input field is empty</Text> : null}
+                                        <Button title='Create Account' type='outline' containerStyle={{ marginTop: 20, marginHorizontal: 20 }} titleStyle={{ color: '#ecfaff', fontWeight: 'bold' }}
+                                            buttonStyle={{ backgroundColor: '#4dc9ff' }} onPress={() => {
                                                 handleCreate();
-                                                setreq_status('Loading');
                                             }} />
-                                        <Button title='Cancel ' type='outline' containerStyle={{ margin: 20 }} titleStyle={{ color: '#d2f8ff', fontWeight: 'bold' }}
-                                            buttonStyle={{ borderColor: '#4dc9ff' }} onPress={closeModal} />
-                                        {req_status === 'Failed' ? <Text style={{ color: 'red', marginLeft: 20, fontSize: 18 }}>Oops, Something went wrong.Please try again Later.</Text> : null}
-                                    </ScrollView>
+                                        {req_status === 'Failed' ? <Text style={{ color: 'red', marginLeft: 20, fontSize: 16 }}>*Oops, Something went wrong.Please try again Later.</Text> : null}
+                                    </View>
                             }
-                        </View>
+                        </ScrollView>
                 }
             </SafeAreaView>
     );
@@ -190,17 +201,17 @@ const styles = StyleSheet.create({
         color: '#4dc9ff'
     },
     img: {
-        width: '100%',
-        height: '100%',
-        resizeMode: 'cover',
-
+        width: 250,
+        height: 250,
+        alignSelf:'center',
+        marginTop:50
     },
     container: {
-        position: 'absolute',
-        top: 50,
-        bottom: 0,
-        left: 0,
-        right: 0
+        position: 'relative',
+        elevation:2,
+        borderTopEndRadius:20,
+        borderTopLeftRadius:20,
+        borderTopRightRadius:20,
     },
     formtext: {
         fontWeight: 'bold',
@@ -216,7 +227,8 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#4dc9ff',
         marginVertical: 5,
-        color: '#4dc9ff'
+        color: '#4dc9ff',
+        paddingLeft:10
     },
     inputotp: {
         height: 35,

@@ -3,6 +3,9 @@ import { View, Text, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Divider } from 'react-native-elements';
 
+
+// Shows bill in the Cart Screen 
+// TODO : Configure  tax implentation and further Total compensation
 const Billcompo = ({ total }) => {
     const topay = total + 10;
     return (

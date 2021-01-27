@@ -1,11 +1,11 @@
-import React, {  useState } from 'react';
-import { Text, View, ImageBackground, StyleSheet, TouchableOpacity } from 'react-native';
+import React from 'react';
+import { Text, View, ImageBackground, StyleSheet } from 'react-native';
 import { Divider } from 'react-native-elements';
 import { FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
 import Server from '../server';
 import Custombutton from './DisplayButton'; 
 
-
+// Displays a list of dishes which are either marked as mustTry or BestSeller
 const Rendermenu = ({ res,id,name,img }) => {
     const server = Server;
     const feature = res.bestSeller || res.mustTry;

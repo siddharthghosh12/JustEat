@@ -61,7 +61,7 @@ const Mapscreen = () => {
             </View> :
             <View style={styles.container}>
                 {
-                    state.user.address.length === 0 ?
+                    state?.user?.address.length === 0 ?
                         <KeyboardAvoidingView style={styles.container}
                             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                         >
@@ -111,7 +111,7 @@ const Mapscreen = () => {
                             <ScrollView showsVerticalScrollIndicator={false} >
                                 <Text style={styles.Text}>Saved addresses</Text>
                                 {
-                                    state.user.address.map((item, index) => {
+                                    state?.user?.address.map((item, index) => {
                                         return (
                                             <View key={index}>
                                                 <TouchableOpacity style={{ marginTop: 15, flexDirection: 'row' }} onPress={() => {
@@ -135,7 +135,7 @@ const Mapscreen = () => {
                                                     </View>
                                                 </TouchableOpacity>
                                                 {
-                                                    index !== state.user.address.length - 1 ?
+                                                    index !== state?.user?.address.length - 1 ?
                                                         <Divider style={{ margin: 15 }} /> : null
                                                 }
                                             </View>
@@ -163,6 +163,7 @@ const Mapscreen = () => {
                                         set_req_status('Loading')
                                         handle_save_address()
                                     }}
+                                    disabled={state.user !== null ? false : true}
                                 />
                             </ScrollView>
                         </SafeAreaView>

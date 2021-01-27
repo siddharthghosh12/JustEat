@@ -20,5 +20,5 @@ export default () => {
             Search();
     },[]);
 
-    return [result];
+    return {result,id};
 }

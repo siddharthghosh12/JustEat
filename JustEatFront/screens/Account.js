@@ -1,67 +1,74 @@
 import React, { useContext, useState } from 'react';
 import { Button, Divider } from 'react-native-elements';
-import { Text, View, StyleSheet, Image, Dimensions, Modal,TouchableOpacity } from 'react-native';
+import { Text, View, StyleSheet, Dimensions, TouchableOpacity, ImageBackground } from 'react-native';
 import { Entypo } from '@expo/vector-icons'
-import { Context } from '../Context/userContext';
-import Server from '../server';
-import Loginform from '../components/LoginForm';
+import { Context } from '../Context/userContext'
 import Managecompo from '../components/manage_account';
 import Border from '../thickborder';
 import Ordercompo from '../components/ordercompo';
 import { AntDesign } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native'
 
 const screen_width = Dimensions.get('screen').width;
+const screen_height = Dimensions.get('screen').height;
 const AccountScreen = () => {
 
-    const { state,Logout } = useContext(Context);
-    const [modalvisible, setModalvisible] = useState(false);
+    const navigation = useNavigation()
+    const { state, Logout } = useContext(Context);
 
-    
+    const Img_icon = () => {
+        return(
+            <View style={styles.name_img}>
+                <Text style={styles.name_img_text}>{state.user.user.name[0]}</Text>
+            </View>
+        )
+    }
+
+
     return (
         state?.user === null ?
             <View style={styles.container}>
-                <Image source={require('../assets/account.png')} style={styles.image} />
-                <Text style={styles.heading}>ACCOUNT</Text>
-                <Text style={styles.Text}>Login/Create Account to fill your tummy</Text>
-                <Button title='Login' buttonStyle={{ width: 200, alignSelf: 'center', borderColor: '#4dc9ff' }}
-                    type='outline' titleStyle={{ color: '#4dc9ff', fontSize: 18 }} onPress={() => setModalvisible(true)} />
-                <Modal animationType='slide'
-                    transparent={true} visible={modalvisible}
-                >
-                    <View style={styles.containerView}>
-                        <View style={styles.modalView}>
-                            <Loginform closeModal={() => setModalvisible(false)} />
-                        </View>
-                    </View>
-                </Modal>
+                <ImageBackground source={require('../assets/Food.png')} style={styles.image} />
+                <Button title='Login / Register' buttonStyle={{ width: 300, alignSelf: 'center', backgroundColor: '#4dc9ff', borderRadius: 10, marginVertical: 10 }}
+                    type='solid' titleStyle={{ color: '#ecfaff', fontSize: 18 }} onPress={() => navigation.navigate('Login')} />
                 <Divider style={{ margin: 20, height: 2, backgroundColor: '#4dc9ff' }} />
                 <Managecompo iconname='ios-mail' title='Send Feedback' />
             </View> :
             <View style={styles.account_container}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <Text style={styles.heading}>{state.user.user.name.toUpperCase()}</Text>
+                    <View style={{ flexDirection: 'row' }}>
+                        <Img_icon />
+                        <Text style={styles.heading}>{state.user.user.name.toUpperCase()}</Text>
+                    </View>
                     <TouchableOpacity>
-                        <Text style={[styles.heading,{color:'#4dc9ff',marginRight:15}]}>edit</Text>
+                        <Text style={[styles.heading, { color: '#4dc9ff', marginRight: 15 }]}>edit</Text>
                     </TouchableOpacity>
                 </View>
                 <View style={{ flexDirection: 'row' }}>
+                    <Entypo name='dot-single' size={20} color='black' style={styles.icon} />
                     <Text style={styles.Text}>{state.user.user.Phone}</Text>
-                    <Entypo name='dot-single' size={20} color='#a9a9a9' />
-                    <Text style={styles.emailtext}>{state.user.user.email}</Text>
                 </View>
-                <Divider style={{ margin: 5, height: 2, backgroundColor: '#4dc9ff' }} />
-                <Managecompo iconname='home' title='Manage Address' />
+                <View style={{ flexDirection: 'row' }}>
+                    <Entypo name='dot-single' size={20} color='black' style={styles.icon} />
+                    <Text style={styles.Text}>{state.user.user.email}</Text>
+                </View>
+                <Divider style={{ margin: 5, height: 2, backgroundColor: 'black' }} />
+                <TouchableOpacity onPress={() => navigation.navigate('Address')}>
+                    <Managecompo iconname='home' title='Manage Address' />
+                </TouchableOpacity>
                 <Managecompo iconname='money' title='Payments' />
-                <Managecompo iconname='heart-o' title='Favourites' />
+                <TouchableOpacity onPress={() => navigation.navigate('Favourites')}>
+                    <Managecompo iconname='heart-o' title='Favourites' />
+                </TouchableOpacity>
                 <Managecompo iconname='ios-mail' title='Send Feedback' />
                 <View style={styles.order_cont}>
-                    <Text style={[styles.Text,{color:'#4dc9ff',marginBottom:5}]}>Past Orders</Text>
+                    <Text style={styles.Past_order_text}>Past Orders</Text>
                 </View>
                 <Ordercompo />
                 <Border height={20} />
                 <TouchableOpacity style={styles.logout_cont} onPress={() => Logout()}>
-                    <Text style={[styles.heading,{marginTop:15}]}>Logout</Text>
-                    <AntDesign name='poweroff' size={20} color='black' style={{margin:15}} />
+                    <Text style={[styles.heading, { marginTop: 15 }]}>Logout</Text>
+                    <AntDesign name='poweroff' size={20} color='black' style={{ margin: 15 }} />
                 </TouchableOpacity>
             </View>
     );
@@ -69,58 +76,62 @@ const AccountScreen = () => {
 
 const styles = StyleSheet.create({
     container: {
-        marginTop: 1
+        marginTop: 1,
+        flex: 1,
     },
     image: {
-        height: 400,
-        width: screen_width
+        height: screen_height / 1.5,
+        width: screen_width,
+        resizeMode: 'cover',
     },
     heading: {
         fontSize: 17,
         fontWeight: 'bold',
         marginTop: 25,
-        marginLeft: 15
     },
     Text: {
-        marginLeft: 15,
+        marginLeft: 5,
         fontWeight: '900',
-        color: '#a9a9a9',
-        marginBottom: 15
+        color: '#a9a9a9'
     },
-    modalView: {
-        margin: 10,
-        backgroundColor: 'white',
-        borderRadius: 20,
-        flex: 1,
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-        elevation: 5,
-    },
-    containerView: {
-        margin: 20,
-        flex: 1
+    icon: {
+        marginLeft: 10
     },
     account_container: {
         marginTop: 20,
         flex: 1
     },
-    emailtext: {
-        fontWeight: '900',
-        color: '#a9a9a9',
-        marginBottom: 15
+    order_cont: {
+        backgroundColor: '#f2f0f0',
+        justifyContent: 'center'
     },
-    order_cont:{
-        backgroundColor:'#f2f0f0',
-        height:30
+    logout_cont: {
+        flexDirection: 'row',
+        justifyContent: 'space-between'
     },
-    logout_cont:{
-        flexDirection:'row',
-        justifyContent:'space-between'
+    Past_order_text: {
+        justifyContent: 'center',
+        color: 'black',
+        marginLeft: 15,
+        fontWeight: 'bold',
+        marginVertical: 15
+    },
+    name_img: {
+        backgroundColor:'#ecfaff',
+        marginHorizontal:12,
+        width:50,
+        height:50,
+        justifyContent:'center',
+        alignItems:'center',
+        borderRadius:25,
+        marginVertical:10,
+        borderColor:"#4dc",
+        borderWidth:1
+    },
+    name_img_text :{
+        color:'#4dc9ff',
+        fontWeight:"800",
+        fontSize:22
     }
 })
 

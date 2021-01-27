@@ -43,6 +43,10 @@ const addressSchema = new Schema({
     address:{
         type:String,
         default:''
+    },
+    save_as_current:{
+        type:Boolean,
+        default:false
     }
 });
 

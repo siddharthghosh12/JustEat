@@ -6,9 +6,16 @@ import CountDown from 'react-native-countdown-component';
 import userapi from '../api/dishapi';
 import { Context } from '../Context/userContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useNavigation} from '@react-navigation/native';
+import Loading_compo from './Loadingcompo';
 
-const OtpVerifyScreen = ({ phone, switch_off_modal }) => {
 
+// TODO: Show loading animation and check any vulnerabilities
+
+// Displays an OTP code input field with a countdown timer
+const OtpVerifyScreen = ({ phone}) => {
+
+    // Variables to handle various components of the screen 
     const stop_time = 30;
     const [disable, setdisable] = useState(true);
     const [counter, setcounter] = useState(30);
@@ -16,8 +23,10 @@ const OtpVerifyScreen = ({ phone, switch_off_modal }) => {
     const [random, setrandom] = useState(Math.random());
     const [loading, setloading] = useState(false);
     const { Login } = useContext(Context);
+    const navigation = useNavigation();
 
 
+    // handles resend code request 
     const handle_resend = async () => {
         setrandom(Math.random());
         setcounter(stop_time);
@@ -28,6 +37,7 @@ const OtpVerifyScreen = ({ phone, switch_off_modal }) => {
         });
     }
 
+    // Function to verify the OTP and save the user state to async Storage and push user object in to the global state
     const handleVerify = async (code) => {
         setloading(true);
         try {
@@ -39,16 +49,11 @@ const OtpVerifyScreen = ({ phone, switch_off_modal }) => {
 
             if (otp_res.status === 200) {
                 setreq_status('Success');
-                let token_obj = {
-                    token:otp_res.data.token
-                }
-                await AsyncStorage.mergeItem('user', JSON.stringify(token_obj));
+                await AsyncStorage.setItem('user', JSON.stringify(otp_res.data.user));
 
                 let user_state = await AsyncStorage.getItem('user');
                 const user = JSON.parse(user_state);
-                console.log(token_obj);
-                console.log(user);
-                switch_off_modal();
+                navigation.goBack();
                 Login(user);
                 return ;
             }
@@ -62,7 +67,7 @@ const OtpVerifyScreen = ({ phone, switch_off_modal }) => {
     return (
         loading === true ? 
         <View style={styles.container}>
-            <ActivityIndicator size='large' color='#4dc9ff' />
+           <Loading_compo />
         </View> :
             <View style={styles.container} >
                 <View style={{ marginVertical: 100 }}>

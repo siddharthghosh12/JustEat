@@ -4,11 +4,7 @@ import Server from '../server';
 import Custombutton from './DisplayButton';
 
 const Display = ({ item, restname, restid, rest_img }) => {
-  /*  console.log('dish',item);
-    console.log('Restid',restid);
-    console.log('Restname',restname);
-    console.log('Rest_img',rest_img);
-    */
+ 
     return (
         <View style={styles.container}>
         <Image source={{ uri: `${Server}/${item.image}` }} style={styles.imgstyle} />

@@ -3,15 +3,15 @@ import React, { useRef, useContext, useState, useEffect } from 'react';
 import { View, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import { MaterialIcons, Feather } from '@expo/vector-icons';
 import { Context } from '../Context/dishContext';
-/*
-Custom button for adding or removing dishes to/from the Cart
-*/
+
+// TODO: Allow orders only from a single canteen
+//Custom button for adding or removing dishes to/from the Cart
 const Custombutton = ({ dish, restid, restname, restimg }) => {
-    /* 
-    Use of context API for data management across components. 
-        basically to show data in to the cart screen 
-        */
+    
+    // functions to change the global state by adding or removing dishes
     const { state, addToCart, removeFromCart } = useContext(Context);
+
+
     //Variable for animating the Add Text
     const onClickAdd = useRef(new Animated.Value(0)).current;
 
@@ -26,7 +26,10 @@ const Custombutton = ({ dish, restid, restname, restimg }) => {
         quantity: 1
     }
 
+    // Keeps the count of number of dishes
     const [count, setcount] = useState(0);
+
+    // function which watches any change in the global state to sync up changes to display
     const checkCount = () => {
         state.map((data) => {
             if (data.restid === item.restid && data.dish.name === item.dish.name) {
@@ -36,6 +39,9 @@ const Custombutton = ({ dish, restid, restname, restimg }) => {
             }
         });
     }
+
+
+    // Runs the above function each time when the screen is mounted and as the global state changes 
     useEffect(() => {
         let mounted = true;
         if (mounted) {

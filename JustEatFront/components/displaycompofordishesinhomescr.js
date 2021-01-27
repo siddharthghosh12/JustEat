@@ -5,7 +5,8 @@ import Server from '../server';
 
 
 const Displaycompo = ({result}) => {
-   // console.log(result.name);
+
+    
     const server=Server;
     return(
         <View style={{flex:1}}> 
