@@ -47,7 +47,7 @@ const DetailsScreen = ({ navigation }) => {
     const item={
         id:id,
         name:result.name,
-        img:result.image,
+        image:result.image,
         trademark:result.trademark,
         CostFor2:result.CostFor2,
         rating:result.rating,

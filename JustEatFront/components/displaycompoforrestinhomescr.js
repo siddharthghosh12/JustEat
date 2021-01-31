@@ -1,7 +1,9 @@
 import React from 'react';
-import {View,Text,StyleSheet,Image} from 'react-native';
+import {View,Text,StyleSheet} from 'react-native';
+import {Image} from 'react-native-elements'
 import Server from '../server';
 import {FontAwesome,Entypo} from '@expo/vector-icons';
+import Loading_compo from './Loadingcompo';
 
 
 // Displays a list of restaurants 
@@ -10,7 +12,7 @@ const Displaycompo = ({result}) => {
   
     return(
             <View style={styles.container}>
-                <Image style={styles.imgstyle} source={{uri:`${server}/${result.image}`}}/>
+                <Image style={styles.imgstyle} source={{uri:`${server}/${result.image}`}} PlaceholderContent={<Loading_compo />}/>
                 <View style={styles.innercont}>
                     <Text style={styles.text}>{result.name}</Text>
                     <Text style={styles.innertext}>{result.trademark}</Text>

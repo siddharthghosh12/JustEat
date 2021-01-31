@@ -1,19 +1,19 @@
 import React, { useState, useContext } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { Button } from 'react-native-elements'
 import CodeInput from 'react-native-confirmation-code-input';
 import CountDown from 'react-native-countdown-component';
 import userapi from '../api/dishapi';
 import { Context } from '../Context/userContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import Loading_compo from './Loadingcompo';
 
 
 // TODO: Show loading animation and check any vulnerabilities
 
 // Displays an OTP code input field with a countdown timer
-const OtpVerifyScreen = ({ phone}) => {
+const OtpVerifyScreen = ({ phone, email, editinfo }) => {
 
     // Variables to handle various components of the screen 
     const stop_time = 30;
@@ -22,7 +22,7 @@ const OtpVerifyScreen = ({ phone}) => {
     const [req_status, setreq_status] = useState('');
     const [random, setrandom] = useState(Math.random());
     const [loading, setloading] = useState(false);
-    const { Login } = useContext(Context);
+    const { Edit_info,Login } = useContext(Context);
     const navigation = useNavigation();
 
 
@@ -41,13 +41,26 @@ const OtpVerifyScreen = ({ phone}) => {
     const handleVerify = async (code) => {
         setloading(true);
         try {
-            //console.log(code);
             const otp_res = await userapi.post('/users/verifyotp', {
+                email: email,
                 Phone: '+91' + phone,
                 otp: code
             });
 
             if (otp_res.status === 200) {
+                if (editinfo) {
+                    let edit_response = await userapi.put('/users/edit_info',{
+                        email:email,
+                        Phone:phone
+                    });
+                    if(edit_response.status === 200)
+                    {
+                        setreq_status('Success');
+                        Edit_info(phone);
+                        navigation.goBack();
+                        return ;
+                    }
+                }
                 setreq_status('Success');
                 await AsyncStorage.setItem('user', JSON.stringify(otp_res.data.user));
 
@@ -55,7 +68,7 @@ const OtpVerifyScreen = ({ phone}) => {
                 const user = JSON.parse(user_state);
                 navigation.goBack();
                 Login(user);
-                return ;
+                return;
             }
             setreq_status('Failed')
         }
@@ -65,10 +78,10 @@ const OtpVerifyScreen = ({ phone}) => {
 
     }
     return (
-        loading === true ? 
-        <View style={styles.container}>
-           <Loading_compo />
-        </View> :
+        loading === true ?
+            <View style={styles.container}>
+                <Loading_compo />
+            </View> :
             <View style={styles.container} >
                 <View style={{ marginVertical: 100 }}>
                     <Text style={styles.form_text} >Enter Otp sent to +91{phone}</Text>

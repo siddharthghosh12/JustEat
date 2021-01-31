@@ -73,7 +73,13 @@ userRouter.post('/register', (req, res, next) => {
 
 userRouter.post('/login', (req, res, next) => {
   const phone = String(req.body.Phone).replace(/[^\d]/g, '');
-  Users.findOne({ Phone: phone })
+  Users.findOne({
+    $or:
+      [
+        { email: req.body.email },
+        { Phone: phone }
+      ]
+  })
     .then(user => {
       if (user === null)
         return res.status(422).send('You must have an account to logIn');
@@ -82,7 +88,7 @@ userRouter.post('/login', (req, res, next) => {
         twilio.messages.create({
           body: `Your One Time Password is ${code}. Use this to login to your JustEat account`,
           to: '+' + phone,
-          from: '+12052367227'
+          from: '+12625189593'
         }, (err) => {
           if (err)
             return res.status(422).send(err);
@@ -110,7 +116,13 @@ userRouter.post('/login', (req, res, next) => {
 
 userRouter.post('/verifyotp', (req, res, next) => {
   const phone = String(req.body.Phone).replace(/[^\d]/g, '');
-  Users.findOne({ Phone: phone })
+  Users.findOne({
+    $or:
+      [
+        { email: req.body.email },
+        { Phone: phone }
+      ]
+  })
     .then(user => {
       const code = req.body.otp.toString();
       if (user.otp !== code || !user.otpValid) {
@@ -148,7 +160,6 @@ userRouter.post('/save_address', (req, res, next) => {
   const phone = String(req.body.Phone).replace(/[^\d]/g, '');
   Users.findOne({ Phone: phone })
     .then((user) => {
-      console.log(user);
       user.Address.push({
         title: req.body.title,
         address: req.body.address
@@ -164,8 +175,69 @@ userRouter.post('/save_address', (req, res, next) => {
       })
     })
     .catch(err => console.log(err));
+});
+
+userRouter.put('/edit_address', (req, res, next) => {
+  const phone = String(req.body.Phone).replace(/[^\d]/g, '');
+  Users.findOne({ Phone: phone })
+    .then((user) => {
+      user.Address.map((item) => {
+        if (item._id.toString() === req.body._id.toString()) {
+          item.title = req.body.title;
+          item.address = req.body.address;
+          return item;
+        }
+        return item;
+      });
+      user.save((err, user) => {
+        if (err)
+          return res.status(422).send({ error: err })
+        else {
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'application/json')
+          res.send({ success: true });
+        }
+      })
+    }).catch(e => console.log(e));
+});
+
+userRouter.delete('/delete_address', (req, res, next) => {
+  const phone = String(req.body.Phone).replace(/[^\d]/g, '');
+  Users.findOne({ Phone: phone })
+    .then((user) => {
+      const index = user.Address.findIndex(item => item._id.toString() === req.body._id.toString());
+      if (index >= 0) {
+        user.Address.splice(index, 1);
+      }
+      user.save((err, user) => {
+        if (err)
+          return res.status(422).send({ error: err })
+        else {
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'application/json')
+          res.send({ success: true });
+        }
+      })
+    }).catch(e => console.log(e));
 })
 
-
+userRouter.put('/edit_info', (req, res, next) => {
+  const email = String(req.body.email);
+  Users.findOne({ email: email })
+    .then((user) => {
+      const phone = String(req.body.Phone).replace(/[^\d]/g, '');
+      user.Phone = phone;
+      user.save((err, user) => {
+        if (err)
+          return res.status(422).send({ error: err })
+        else {
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'application/json')
+          res.send({ success: true });
+        }
+      })
+    })
+    .catch(e => console.log(e));
+})
 module.exports = userRouter;
 

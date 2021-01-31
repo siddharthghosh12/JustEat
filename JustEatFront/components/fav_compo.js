@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Context } from '../Context/userContext';
 import { AntDesign } from '@expo/vector-icons';
 import Displaycompo from './displaycompoforrestinhomescr';
-
+import Border from '../thickborder';
 
 // Displays a list of restaurants whenever the user marks some restaurant as FAVOURIE
 const Favourites = ({navigation}) => {
@@ -20,10 +20,11 @@ const Favourites = ({navigation}) => {
                 <Text style={{ color: '#a9a9a9', top: -30 }}>Once you favourite a restaurant, it will appear here.</Text>
             </SafeAreaView>
             :
-            <SafeAreaView>
-                <TouchableOpacity onPress={() => navigation.goBack()} style={{marginLeft:10}}>
+            <SafeAreaView style={{flex:1}}>
+                <TouchableOpacity onPress={() => navigation.goBack()} style={{margin:15}}>
                     <AntDesign name='arrowleft' size={20} color="#404040" />
                 </TouchableOpacity>
+                <Border height={15} />
                 <FlatList
                     data={state.user.favourites}
                     keyExtractor={(item) => item.id.toString()}

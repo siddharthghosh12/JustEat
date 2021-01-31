@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Divider } from 'react-native-elements'
-import { FontAwesome, Ionicons } from '@expo/vector-icons'
+import { EvilIcons, Ionicons } from '@expo/vector-icons'
 
 
 
@@ -11,8 +11,7 @@ const Managecompo = ({ iconname, title }) => {
         <View>
             <View style={styles.container}>
                 <View style={{ flexDirection: 'row' }}>
-                    {title === 'Send Feedback' ? <Ionicons name={iconname} size={25} color='black' /> :
-                        <FontAwesome name={iconname} size={25} color='black' />}
+                    <EvilIcons name={iconname} size={30} color='black' style={{alignSelf:'center'}} />
                     <Text style={styles.Text}>{title}</Text>
                 </View>
                 <TouchableOpacity>
@@ -31,8 +30,8 @@ const styles = StyleSheet.create({
         margin: 15,
     },
     Text: {
-        fontWeight: 'bold',
-        fontSize: 16,
+        fontWeight: '900',
+        fontSize: 15,
         color: '#4dc9ff',
         marginLeft: 15
     }

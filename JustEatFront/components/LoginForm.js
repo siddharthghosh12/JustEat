@@ -5,6 +5,7 @@ import userapi from '../api/dishapi';
 import { SafeAreaView } from 'react-native';
 import OtpVerifyScreen from './otpform';
 import Loading_compo from './Loadingcompo';
+import {useRoute}  from '@react-navigation/native'
 /*
 TODO: Configure the design of the login screen.
       Add Loading animation.
@@ -13,6 +14,12 @@ TODO: Configure the design of the login screen.
 */
 // Displays a Login form on the screen
 const Loginform = () => {
+
+
+    const route  = useRoute();
+    let init = route.params?.show_otp===true ? true : false;
+    let _Phone = route.params?.Phone;
+    let _email = route.params?.email; 
     
     // Various params to check user_info and validate for network requests
     const [username, setusername] = useState('');
@@ -25,7 +32,7 @@ const Loginform = () => {
     const [validmob, setvalidmob] = useState(true);
     const [loginform, setloginform] = useState(false);
     const [req_status, setreq_status] = useState('');
-    const [show_otp_screen, setshow_otp_screen] = useState(false);
+    const [show_otp_screen, setshow_otp_screen] = useState(init);
 
 
     // Validation of mobile number of the user
@@ -124,7 +131,7 @@ const Loginform = () => {
                 {
                     show_otp_screen === true ?
                         <View style={styles.loading_cont} >
-                                <OtpVerifyScreen phone={mobile}/>
+                                <OtpVerifyScreen phone={mobile !== '' ? mobile : _Phone} email={email !== '' ? email:_email} editinfo={init}/>
                         </View>
                         :
                         <ScrollView showsVerticalScrollIndicator={false}>

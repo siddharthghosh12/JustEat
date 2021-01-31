@@ -5,7 +5,7 @@ import { View, Text,StyleSheet } from 'react-native';
 const Ordercompo = () => {
     return (
         <View>
-            <Text style={{marginLeft:15,color:'#a9a9a9'}}>You don't have any past orders</Text>
+            <Text style={{alignSelf:'center',color:'#a9a9a9'}}>You don't have any past orders</Text>
         </View>
     );
 }

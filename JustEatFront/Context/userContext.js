@@ -21,7 +21,7 @@ const userReducer = (state, action) => {
             a new array along with the copied array and action.payload 
         */
         case "SAVE_ADDRESS":
-            let new_address_array = state.user.address.map(a => {return {...a}});
+            let new_address_array = state.user.address.map(a => { return { ...a } });
             for (key in new_address_array) {
                 new_address_array[key].save_as_current = false
             }
@@ -32,33 +32,32 @@ const userReducer = (state, action) => {
                     address: [...new_address_array, action.payload]
                 }
             }
-            /*
-                Set save_as_current prop for all the previous saved items as false
-                and true for action.payload
-            */
+        /*
+            Set save_as_current prop for all the previous saved items as false
+            and true for action.payload
+        */
         case 'SET_NEW_ADDRESS':
-                let array = state.user.address.map(a => {return {...a}})
-                let i;
-                for(i=0;i<array.length;i++)
-                {
-                    array[i].save_as_current=false;
-                    if(i===action.payload)
-                        array[i].save_as_current=true;
-                } 
-                return {
-                    ...state,
-                    user: {
-                        ...state.user,
-                        address: [...array]
-                    }
+            let array = state.user.address.map(a => { return { ...a } })
+            let i;
+            for (i = 0; i < array.length; i++) {
+                array[i].save_as_current = false;
+                if (i === action.payload)
+                    array[i].save_as_current = true;
+            }
+            return {
+                ...state,
+                user: {
+                    ...state.user,
+                    address: [...array]
                 }
+            }
         // return a new object along with the previous array and action.payload
         case "ADD_TO_FAVOURITES":
             return {
                 ...state,
-                user:{
+                user: {
                     ...state.user,
-                    favourites:[...state.user.favourites,action.payload]
+                    favourites: [...state.user.favourites, action.payload]
                 }
             }
         // Filter the id in action.PAYLOAD and return the object
@@ -71,9 +70,50 @@ const userReducer = (state, action) => {
             }
             return {
                 ...state,
+                user: {
+                    ...state.user,
+                    favourites: remove()
+                }
+            }
+        case "DELETE_ADDRESS":
+            let old_address = [...state.user.address]
+            let remove_add = () => {
+                return (old_address || []).filter((item) => {
+                    return item._id !== action.payload;
+                })
+            }
+            return {
+                ...state,
+                user: {
+                    ...state.user,
+                    address: remove_add()
+                }
+            }
+        case "EDIT_ADDRESS":
+            let new_add_array = state.user.address.map((obj) => {
+                if (obj._id === action.payload._id) {
+                    obj.title = action.payload.title;
+                    obj.address = action.payload.address;
+                    return obj
+                }
+                return obj;
+            });
+            return {
+                ...state,
+                user: {
+                    ...state.user,
+                    address: [...new_add_array]
+                }
+            }
+        case "EDIT__INFO":
+            return {
+                ...state,
                 user:{
                     ...state.user,
-                    favourites:remove()
+                    user:{
+                        ...state.user.user,
+                        Phone:action.payload
+                    }
                 }
             }
         default:
@@ -103,7 +143,7 @@ const Logout = (dispatch) => async () => {
 const Save_address = (dispatch) => async (item) => {
     let prev_user = await AsyncStorage.getItem('user');
     let user = JSON.parse(prev_user);
-    let new_address_array = user.address.map(a => {return {...a}});
+    let new_address_array = user.address.map(a => { return { ...a } });
     for (key in new_address_array) {
         new_address_array[key].save_as_current = false;
     }
@@ -112,14 +152,14 @@ const Save_address = (dispatch) => async (item) => {
         ...user,
         address: [...new_address_array, item]
     }
-   // console.log(new_user);
+    // console.log(new_user);
     await AsyncStorage.setItem('user', JSON.stringify(new_user));
     dispatch({ type: 'SAVE_ADDRESS', payload: item })
 }
 const Set_address = (dispatch) => async (item) => {
     let previous_user = await AsyncStorage.getItem('user');
     let _user = JSON.parse(previous_user);
-    let address_array = _user.address.map(a => {return {...a}});
+    let address_array = _user.address.map(a => { return { ...a } });
     let i;
     for (i = 0; i < address_array.length; i++) {
         address_array[i].save_as_current = false;
@@ -139,14 +179,13 @@ const Set_address = (dispatch) => async (item) => {
 const Handle_favourites = (dispatch) => async (item) => {
     let prev_user = await AsyncStorage.getItem('user');
     let user = JSON.parse(prev_user);
-    if(!item.touched)
-    {
+    if (!item.touched) {
         let new_user = {
             ...user,
-            favourites:[...user.favourites,item]
+            favourites: [...user.favourites, item]
         }
-        await AsyncStorage.setItem('user',JSON.stringify(new_user))
-        dispatch({type:'ADD_TO_FAVOURITES',payload:item});
+        await AsyncStorage.setItem('user', JSON.stringify(new_user))
+        dispatch({ type: 'ADD_TO_FAVOURITES', payload: item });
         return;
     }
     old_fav = [...user.favourites]
@@ -158,11 +197,62 @@ const Handle_favourites = (dispatch) => async (item) => {
 
     let new_user = {
         ...user,
-        favourites : remove_fav()
+        favourites: remove_fav()
     }
-    await AsyncStorage.setItem('user',JSON.stringify(new_user));
-    dispatch({type:'REMOVE_FROM_FAVOURITES',payload:item})
+    await AsyncStorage.setItem('user', JSON.stringify(new_user));
+    dispatch({ type: 'REMOVE_FROM_FAVOURITES', payload: item })
 }
 
+const Edit_Address = (dispatch) => async (item) => {
+    let prev_user = await AsyncStorage.getItem('user');
+    let user = JSON.parse(prev_user);
+    let new_address_array = user.address.map((obj) => {
+        if (obj._id === item._id) {
+            obj.title = item.title;
+            obj.address = item.address;
+            return obj
+        }
+        return obj;
+    })
 
-export const { Context, Provider } = createDataContext(userReducer, { Login, Logout, Save_address,Set_address,Handle_favourites }, initailState)
+    let new_user = {
+        ...user,
+        address: [...new_address_array]
+    }
+
+    await AsyncStorage.setItem('user', JSON.stringify(new_user));
+    dispatch({ type: "EDIT_ADDRESS", payload: item })
+}
+
+const Delete_Address = (dispatch) => async (item) => {
+    let prev_user = await AsyncStorage.getItem('user');
+    let user = JSON.parse(prev_user);
+    const remove_Address = () => {
+        return (user.address || []).filter((obj) => {
+            return obj._id !== item
+        })
+    }
+    let new_user = {
+        ...user,
+        address: remove_Address()
+    }
+    await AsyncStorage.setItem('user', JSON.stringify(new_user));
+    dispatch({ type: "DELETE_ADDRESS", payload: item })
+}
+
+const Edit_info = (dispatch) => async (item) => {
+    let prev_user = await AsyncStorage.getItem('user');
+    let user = JSON.parse(prev_user);
+
+    let new_user = {
+        ...user,
+        user: {
+            ...user.user,
+            Phone: item
+        }
+    }
+    await AsyncStorage.setItem('user',JSON.stringify(new_user));
+    dispatch({type:"EDIT_INFO",paylaod:item})
+}
+
+export const { Context, Provider } = createDataContext(userReducer, { Login, Logout, Save_address, Set_address, Handle_favourites, Edit_Address, Delete_Address,Edit_info }, initailState)
