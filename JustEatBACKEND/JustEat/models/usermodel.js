@@ -52,9 +52,29 @@ const addressSchema = new Schema({
 
 
 const favSchema = new Schema({
-    restaurant:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'Restaurant'
+    id:{
+        type:mongoose.Schema.Types.ObjectId
+    },
+    name:{
+        type:String,
+        default:''
+    },
+    image:{
+        type:String,
+        default:''
+    },
+    trademark:{
+        type:String,
+        default:''
+    },
+    CostFor2:{
+        type:String
+    },
+    rating:{
+        type:Number
+    },
+    touched:{
+        type:Boolean
     }
 })
 

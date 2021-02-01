@@ -1,5 +1,5 @@
 import React, { useMemo, useContext, useState, useEffect, useRef } from 'react';
-import { Text, View, StyleSheet, ActivityIndicator, FlatList, TouchableOpacity, Animated } from 'react-native';
+import { Text, View, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { Divider } from 'react-native-elements';
 import { FontAwesome } from '@expo/vector-icons';
 import Border from '../thickborder';
@@ -9,15 +9,16 @@ import Restdetail from '../components/restaurantdetail';
 import BottomSheet from '../components/Bottomsheet';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AntDesign } from '@expo/vector-icons';
-import {Context} from '../Context/userContext';
-import Loading_compo from '../components/Loadingcompo'
+import { Context } from '../Context/userContext';
+import Loading_compo from '../components/Loadingcompo';
+import api from '../api/dishapi';
 
 
 
 const DetailsScreen = ({ navigation }) => {
-    const { result,id } = useDishes();
-    const [touched, setouched] = useState(true);
-    const {state,Handle_favourites} = useContext(Context)
+    const { result, id } = useDishes();
+    const [touched, setouched] = useState(false);
+    const { state, Handle_favourites } = useContext(Context)
     const scrollY = useRef(new Animated.Value(0)).current;
     const Currentval = new Animated.Value(1);
     const Animateheart = Animated.createAnimatedComponent(AntDesign);
@@ -31,36 +32,69 @@ const DetailsScreen = ({ navigation }) => {
     }
 
     const TriggerAnimation = () => {
-        Animated.timing(Currentval, {
-            toValue: 2,
-            duration:500,
+        Animated.spring(Currentval, {
+            toValue: 1.5,
+            friction: 2,
             useNativeDriver: true,
         }).start(() => {
             Animated.timing(Currentval, {
                 toValue: 1,
-                duration:300,
+                duration: 300,
                 useNativeDriver: true
             }).start();
         })
     }
 
-    const item={
-        id:id,
-        name:result.name,
-        image:result.image,
-        trademark:result.trademark,
-        CostFor2:result.CostFor2,
-        rating:result.rating,
-        touched:touched
+
+    const add_to_favourites = async () => {
+        if (state.user === null) {
+            return;
+        }
+        setouched(!touched);
+        Handle_favourites(item);
+        await api.post('/users/add_to_fav', {
+            id: id,
+            name: result.name,
+            image: result.image,
+            trademark: result.trademark,
+            CostFor2: result.CostFor2,
+            rating: result.rating,
+            touched: touched,
+            email:state.user.user.email
+        })
+    }
+
+    const remove_from_favourites = async () => {
+        if (state.user === null) {
+            return;
+        }
+        setouched(!touched);
+        Handle_favourites(item);
+        await api.delete('/users/delete_from_fav', {
+            data: {
+                id: id,
+                email:state.user.user.email
+            }
+        })
+    }
+
+    const item = {
+        id: id,
+        name: result.name,
+        image: result.image,
+        trademark: result.trademark,
+        CostFor2: result.CostFor2,
+        rating: result.rating,
+        touched: touched
     }
 
 
     useEffect(() => {
-      // console.log(item);
-     //console.log(result)
+        // console.log(item);
+        //console.log(result)
         if (touched)
             TriggerAnimation()
-    }, [touched]);
+    }, [state?.user?.favourites]);
 
     const HEADER_MAX_HEIGHT = 200;
     const HEADER_MIN_HEIGHT = 60;
@@ -118,7 +152,7 @@ const DetailsScreen = ({ navigation }) => {
     return (
         result.length === 0 ?
             <View style={styles.loadingcont}>
-               <Loading_compo />
+                <Loading_compo />
             </View> :
             <SafeAreaView style={{ flex: 1 }}>
                 <Animated.View style={[styles.header]}>
@@ -126,29 +160,16 @@ const DetailsScreen = ({ navigation }) => {
                         <TouchableOpacity onPress={() => navigation.goBack()}>
                             <AntDesign name='arrowleft' size={20} color="#404040" />
                         </TouchableOpacity>
-                        <Animated.Text style={[styles.titlestyle], { fontSize: 18, fontWeight: 'bold', opacity: opacity }}>{result.name.toUpperCase()}</Animated.Text>
+                        <Animated.Text style={[styles.titlestyle], { fontSize: 18, fontWeight: 'bold', opacity: opacity }}>{result.name}</Animated.Text>
                         <View style={{ flexDirection: 'row' }}>
-                            <AntDesign name='search1' size={20} color='#808080' />
-                            {touched && state?.user?.favourites.findIndex(item => 
-                            item.id === id
-                            ) !== -1 && state.user !== null  ? <TouchableOpacity onPress={() => {
-                                if(state.user === null)
-                                    return;
-                                setouched(!touched)
-                                Handle_favourites(item);
-                            }} style={{ marginHorizontal: 20 }}>
+                            {state?.user?.favourites.findIndex(item => item.id === id) !== -1 && state.user !== null ? <TouchableOpacity onPress={() => remove_from_favourites()} style={{ marginHorizontal: 20 }}>
                                 <Animateheart name='heart' size={20} color='red' style={{
                                     transform: [
                                         { scale: Currentval }
                                     ]
                                 }} />
                             </TouchableOpacity> :
-                                <TouchableOpacity onPress={() => { 
-                                    if(state.user === null)
-                                        return;
-                                       setouched(!touched)
-                                        Handle_favourites(item)
-                                    }} style={{ marginHorizontal: 20 }}>
+                                <TouchableOpacity onPress={() => add_to_favourites()} style={{ marginHorizontal: 20 }}>
                                     <Animateheart name='hearto' size={20} color='black' />
                                 </TouchableOpacity>}
                         </View>
@@ -206,8 +227,8 @@ const styles = StyleSheet.create({
         position: 'relative',
         top: 0,
         overflow: 'hidden',
-        left:0,
-        right:0,
+        left: 0,
+        right: 0,
     }
 
 });

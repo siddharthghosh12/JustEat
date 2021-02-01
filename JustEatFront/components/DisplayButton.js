@@ -1,6 +1,6 @@
 //import Stuff
-import React, { useRef, useContext, useState, useEffect } from 'react';
-import { View, TouchableOpacity, StyleSheet, Animated } from 'react-native';
+import React, { useContext, useState, useEffect } from 'react';
+import { View, TouchableOpacity, StyleSheet, Animated,Text } from 'react-native';
 import { MaterialIcons, Feather } from '@expo/vector-icons';
 import { Context } from '../Context/dishContext';
 
@@ -10,10 +10,6 @@ const Custombutton = ({ dish, restid, restname, restimg }) => {
     
     // functions to change the global state by adding or removing dishes
     const { state, addToCart, removeFromCart } = useContext(Context);
-
-
-    //Variable for animating the Add Text
-    const onClickAdd = useRef(new Animated.Value(0)).current;
 
 
 
@@ -29,12 +25,13 @@ const Custombutton = ({ dish, restid, restname, restimg }) => {
     // Keeps the count of number of dishes
     const [count, setcount] = useState(0);
 
+
     // function which watches any change in the global state to sync up changes to display
     const checkCount = () => {
         state.map((data) => {
             if (data.restid === item.restid && data.dish.name === item.dish.name) {
                 if (data.quantity !== count) {
-                    setcount(data.quantity);
+                    setcount(data.quantity)
                 }
             }
         });
@@ -47,28 +44,12 @@ const Custombutton = ({ dish, restid, restname, restimg }) => {
         if (mounted) {
             checkCount();
             if (!state.find(item => item.dish.name === dish.name) && count)
-                setcount(0);
+                setcount(0)
         }
 
         return () => mounted = false;
 
     }, [state]);
-
-    // Animation function for moving the add button down
-    const addMovesDown = () => {
-        Animated.timing(onClickAdd, {
-            toValue: 10,
-            duration: 500,
-            useNativeDriver: true
-        }).start(() => {
-            Animated.timing(onClickAdd, {
-                toValue: 0,
-                duration: 500,
-                useNativeDriver: true
-            }).start()
-        });
-    }
-
 
 
 
@@ -85,37 +66,23 @@ const Custombutton = ({ dish, restid, restname, restimg }) => {
                 <TouchableOpacity onPress={() => {
                     setcount(count+1)
                     addToCart(item);
-                    addMovesDown();
                 }}>
                     <Animated.Text style={[{
-                        color: '#4DC9FF',
-                        transform: [
-                            {
-                                translateY: onClickAdd
-                            }
-                        ]
-                    }]}>Add</Animated.Text>
+                        color: '#4DC9FF'}]}>Add</Animated.Text>
                 </TouchableOpacity>
             </View> :
             <View style={styles.container}>
                 <TouchableOpacity onPress={() => {
-                    setcount(count - 1);
+                    setcount(count-1)
                     removeFromCart(item);
                 }} style={styles.iconStyle}>
                     <View>
                         <Feather name='minus' size={20} color="#4DC9FF" />
                     </View>
                 </TouchableOpacity>
-                <Animated.Text style={[styles.counterStyle,
-                {
-                    transform: [
-                        {
-                            translateY: onClickAdd
-                        }
-                    ]
-                }]}>{count}</Animated.Text>
+                <Text style={styles.counterStyle}>{count}</Text>
                 <TouchableOpacity onPress={() => {
-                    setcount(count + 1)
+                    setcount(count+1)
                     addToCart(item)
                 }} style={styles.iconStyle}>
                     <View>

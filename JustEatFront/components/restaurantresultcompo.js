@@ -76,6 +76,7 @@ const RestResultcompo = ({ title }) => {
                 data={result}
                 keyExtractor={(res) => res._id}
                 ListHeaderComponent={headercompo}
+                showsVerticalScrollIndicator={false}
                 ListFooterComponent={footercompo}
                 onEndReachedThreshold={0.5}
                 renderItem={({ item }) => {

@@ -238,6 +238,56 @@ userRouter.put('/edit_info', (req, res, next) => {
       })
     })
     .catch(e => console.log(e));
+});
+
+userRouter.post('/add_to_fav', (req, res, next) => {
+  email = String(req.body.email);
+  Users.findOne({ email: email })
+    .then((user) => {
+      user.favourites.push({
+        id: req.body.id,
+        name: req.body.name,
+        image: req.body.image,
+        trademark: req.body.trademark,
+        CostFor2: req.body.CostFor2,
+        rating: req.body.rating,
+        touched: req.body.touched
+      });
+      user.save((err, user) => {
+        if (err)
+          return res.status(422).send({ error: err })
+        else {
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'application/json')
+          res.send({ success: true });
+        }
+      })
+    })
+    .catch(e => console.log(e));
 })
+
+userRouter.delete('/remove_from_fav',(req,res,next) => {
+  email=String(req.body.email);
+  Users.findOne({email:email})
+    .then((user) => {
+      let fav_index = user.favourites.findIndex(item => item.id.toString() === req.body.id.toString());
+      if(fav_index >= 0 )
+      {
+        user.favourites.splice(fav_index,1)
+      }
+      user.save((err, user) => {
+        if (err)
+          return res.status(422).send({ error: err })
+        else {
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'application/json')
+          res.send({ success: true });
+        }
+      })
+    })
+      .catch(e => console.log(e));
+})
+
+
 module.exports = userRouter;
 
