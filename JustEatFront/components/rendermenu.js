@@ -6,7 +6,7 @@ import Server from '../server';
 import Custombutton from './DisplayButton'; 
 
 // Displays a list of dishes which are either marked as mustTry or BestSeller
-const Rendermenu = ({ res,id,name,img }) => {
+const Rendermenu = ({ res,id,name,img,showModal,setItem }) => {
     const server = Server;
     const feature = res.bestSeller || res.mustTry;
 
@@ -30,7 +30,7 @@ const Rendermenu = ({ res,id,name,img }) => {
                 <View>
                     <ImageBackground style={styles.imgstyle}
                         source={{ uri: `${server}/${res.image}` }} >
-                        <Custombutton  dish={res} restid={id} restname={name} restimg={img} />
+                        <Custombutton  dish={res} restid={id} restname={name} restimg={img} openModal={showModal} setCartItem={setItem} />
                     </ImageBackground>
                 </View>
             </View>

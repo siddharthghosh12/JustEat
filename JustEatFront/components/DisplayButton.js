@@ -6,7 +6,7 @@ import { Context } from '../Context/dishContext';
 
 // TODO: Allow orders only from a single canteen
 //Custom button for adding or removing dishes to/from the Cart
-const Custombutton = ({ dish, restid, restname, restimg }) => {
+const Custombutton = ({ dish, restid, restname, restimg,openModal,setCartItem }) => {
     
     // functions to change the global state by adding or removing dishes
     const { state, addToCart, removeFromCart } = useContext(Context);
@@ -64,6 +64,13 @@ const Custombutton = ({ dish, restid, restname, restimg }) => {
             }
             ]}>
                 <TouchableOpacity onPress={() => {
+                      if(state.length !== 0 && state[0].restname !== restname)
+                      {
+                            openModal()
+                            setCartItem(item)
+                            return;
+                          
+                      }
                     setcount(count+1)
                     addToCart(item);
                 }}>

@@ -60,6 +60,8 @@ const dishReducer = (state,action) => {
                     return false;
                 return true;
             });
+        case "REPLACE_CART":
+            return [action.payload]
         default:
             return state
     }
@@ -79,4 +81,10 @@ const removeFromCart = (dispatch) => {
     }
 }
 
-export const {Context,Provider} = createDataContext(dishReducer,{ addToCart,removeFromCart },[]);
+const replaceCart = (dispatch) => {
+    return(item) => {
+        dispatch({type:"REPLACE_CART",payload:item})
+    }
+}
+
+export const {Context,Provider} = createDataContext(dishReducer,{ addToCart,removeFromCart,replaceCart },[]);

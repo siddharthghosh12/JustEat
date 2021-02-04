@@ -3,10 +3,10 @@ import { Text,StyleSheet,View,FlatList } from 'react-native';
 import Rendermenu from './rendermenu';
 
 
-const Restdetail = ({items,restname,restid,restimg}) => {
+const Restdetail = ({items,restname,restid,restimg,openModal,setItem}) => {
 
     const renderItem = ({item}) => {
-        return <Rendermenu res={item} id={restid} name={restname} img={restimg}/>
+        return <Rendermenu res={item} id={restid} name={restname} img={restimg} showModal={openModal} setItem={setItem}/>
     }
 
     const Memoval = useMemo(() => renderItem,[items])

@@ -1,6 +1,6 @@
 import React, { useMemo, useContext, useState, useEffect, useRef } from 'react';
-import { Text, View, StyleSheet, TouchableOpacity, Animated } from 'react-native';
-import { Divider } from 'react-native-elements';
+import { Text, View, StyleSheet, TouchableOpacity, Animated, Modal } from 'react-native';
+import { Divider, Button } from 'react-native-elements';
 import { FontAwesome } from '@expo/vector-icons';
 import Border from '../thickborder';
 import useDishes from '../hooks/usedishes';
@@ -10,15 +10,18 @@ import BottomSheet from '../components/Bottomsheet';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AntDesign } from '@expo/vector-icons';
 import { Context } from '../Context/userContext';
+import { Context as DishContext } from '../Context/dishContext'
 import Loading_compo from '../components/Loadingcompo';
 import api from '../api/dishapi';
-
 
 
 const DetailsScreen = ({ navigation }) => {
     const { result, id } = useDishes();
     const [touched, setouched] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [cartItem, setCartItem] = useState({})
     const { state, Handle_favourites } = useContext(Context)
+    const { replaceCart,state:dishState } = useContext(DishContext)
     const scrollY = useRef(new Animated.Value(0)).current;
     const Currentval = new Animated.Value(1);
     const Animateheart = Animated.createAnimatedComponent(AntDesign);
@@ -60,7 +63,7 @@ const DetailsScreen = ({ navigation }) => {
             CostFor2: result.CostFor2,
             rating: result.rating,
             touched: touched,
-            email:state.user.user.email
+            email: state.user.user.email
         })
     }
 
@@ -73,7 +76,7 @@ const DetailsScreen = ({ navigation }) => {
         await api.delete('/users/delete_from_fav', {
             data: {
                 id: id,
-                email:state.user.user.email
+                email: state.user.user.email
             }
         })
     }
@@ -145,7 +148,7 @@ const DetailsScreen = ({ navigation }) => {
     }
 
     const renderItem = ({ item }) => {
-        return <Restdetail items={item} restid={result._id} restname={result.name} restimg={result.image} />
+        return <Restdetail items={item} restid={result._id} restname={result.name} restimg={result.image} openModal={() => setIsModalOpen(!isModalOpen)} setItem={(item) => setCartItem(item)} />
     }
 
     const Memoval = useMemo(() => renderItem, [result])
@@ -175,6 +178,34 @@ const DetailsScreen = ({ navigation }) => {
                         </View>
                     </View>
                 </Animated.View>
+                <View style={styles.modalView}>
+                    <Modal visible={isModalOpen} animationType='fade'
+                        transparent
+                    >
+                        <View style={styles.modal_container}>
+                            <Text style={[styles.titlestyle], { fontSize: 16, fontWeight: 'bold',marginVertical:5 }}>Replace Cart Items?</Text>
+                            <Text style={styles.modalText}>Your cart contain items from</Text>
+                            <Text style={styles.modalText}>{dishState[0]?.restname}.</Text>                                       
+                            <Text style={styles.modalText}>Do you want to replace them?</Text>
+                            <View style={{flexDirection:'row',alignSelf:'center'}}>
+                                <Button
+                                    title='Yes'
+                                    type='outline'
+                                    onPress={() => {
+                                        replaceCart(cartItem);
+                                        setIsModalOpen(!isModalOpen)
+                                    }}
+                                    buttonStyle={{width:100}}
+                                />
+                                <Button title='No'
+                                    type='outline'
+                                    onPress={() => setIsModalOpen(!isModalOpen)}
+                                    buttonStyle={{width:100}}
+                                />
+                            </View>
+                        </View>
+                    </Modal>
+                </View>
                 <Animated.FlatList
                     data={[{ title: 'Recommended', dishes: SendRecommended() }, { title: 'Menu', dishes: result.dishes }]}
                     keyExtractor={res => res.title}
@@ -229,6 +260,35 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
         left: 0,
         right: 0,
+    },
+    modal_container: {
+        backgroundColor: "white",
+        borderRadius: 20,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+        minHeight: 200,
+        justifyContent: 'center',
+        alignItems:'center',
+        marginVertical: 10,
+        width:250,
+        padding:30,
+        alignSelf:'center'
+    },
+    modalView: {
+        flex: 1,
+        alignSelf:'center',
+        position:'absolute',
+    },
+    modalText :{
+        color:"#a9a9a9",
+        fontSize:13,
+        marginVertical:1,
     }
 
 });
