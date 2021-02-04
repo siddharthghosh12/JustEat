@@ -34,7 +34,6 @@ function App() {
         if (user !== null) {
           let user_state = JSON.parse(user);
           if (user_state.token !== null) {
-            console.log('USER FROM ASYNC',user_state)
             Login(user_state);
           }
         }
