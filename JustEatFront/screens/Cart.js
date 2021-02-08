@@ -202,8 +202,7 @@ const Cart = () => {
                                 onPress={() => navigation.navigate('Payments',{
                                     title:title,
                                     address:address,
-                                    toPay:getTotal,
-                                    totalItems:getTotalItems
+                                    deliveryFee:10
                                 })}
                             />
                         </View> : <View></View>
