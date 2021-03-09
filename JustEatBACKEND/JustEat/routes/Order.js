@@ -62,6 +62,7 @@ OrderRouter.post('/place_order', (req, res, next) => {
                                 user.pastOrders.push({
                                     OrderId: info._id,
                                     restName: restname,
+                                    restId:restaurant._id,
                                     address: userAddress,
                                     totalCost: totalCost,
                                     dishes: [...new_dishes_array]

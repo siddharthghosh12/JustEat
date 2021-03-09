@@ -30,13 +30,11 @@ const DeliveryScreen = ({navigation}) => {
             setLoading(true);
             let response = await api.get(`/restaurants/${restId}`);
 
-            let index_of_order = userState.user.orders.findIndex(item => item.orderStatus === 'Delivering');
+
             if (mounted && response.status === 200) {
                 setLoading(false);
+     
                 setRestaurant(response.data);
-
-                if (index_of_order !== -1)
-                    setOrderId(String(userState.user.orders[index_of_order].OrderId).replace(/[^\d]/g, ''));
             }
         }
 
@@ -83,10 +81,10 @@ const DeliveryScreen = ({navigation}) => {
     }
 
     const onRefresh = async () => {
-        // console.log('logging',userState?.user?.orders);
-        // console.log(userState)
+
         setRefreshing(true);
         setLoading(true);
+
         let index = userState.user.orders.findIndex(item => item.orderStatus === 'Delivering');
         if (index !== -1) {
             let id = userState.user.orders[index].OrderId;
@@ -94,6 +92,7 @@ const DeliveryScreen = ({navigation}) => {
             if (response.status === 200) {
                 let order_date = new Date(response.data.orderAt);
                 let cur_date = new Date();
+                setOrderId(String(userState.user.orders[index].OrderId).replace(/[^\d]/g, ''))
                 setTimer(parseInt(String(28 - (cur_date.getTime() - order_date.getTime()) / 60000)));
                 setRefreshing(false);
                 setLoading(false);
@@ -103,14 +102,7 @@ const DeliveryScreen = ({navigation}) => {
             console.log('No order');
     }
 
-    useEffect(() => {
-        let mounted = true;
-
-        if(mounted)
-        {
-            onRefresh();
-        }
-    },[])
+  
 
     const RestMarker = () => {
         return (
@@ -231,7 +223,9 @@ const DeliveryScreen = ({navigation}) => {
                         <TouchableOpacity onPress={() => navigation.goBack()}>
                             <AntDesign name='arrowleft' size={20} style={{ fontWeight: "bold" }} />
                         </TouchableOpacity>
-                        <Text style={styles.headerText}>Order #{orderId}</Text>
+                       {
+                           orderId !== '' ?  <Text style={styles.headerText}>Order #{orderId}</Text>:null 
+                       }
                     </View>
                     <MapView
                         style={styles.map}

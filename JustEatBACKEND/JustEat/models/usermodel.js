@@ -27,6 +27,9 @@ const orderSchema = new Schema({
     restName:{
         type:String,
     },
+    restId: {
+        type:mongoose.Schema.Types.ObjectId
+    },
     address:{
         type:String,
     },
