@@ -18,12 +18,13 @@ const PaymentScreen = ({ navigation }) => {
 
     const route = useRoute();
     const { state: cartState } = useContext(DishContext)
-    const { state: userState } = useContext(UserContext);
+    const { state: userState,Place_Order } = useContext(UserContext);
     const [checked, setChecked] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [clientSecret, setClientSecret] = useState('');
     const [req_status, setReq_status] = useState(false);
-    const [paymentStatus,setPaymentStatus] = useState('')
+    const [paymentStatus, setPaymentStatus] = useState('')
+    const [orderState,setOrderState] = useState(null);
     let { deliveryFee, title, address } = route.params;
     let { toPay } = useCart(cartState, 0);
 
@@ -54,6 +55,33 @@ const PaymentScreen = ({ navigation }) => {
 
     }, [cartState])
 
+    useEffect(() => {
+        let mounted = true;
+        const placeOrder = async () => {
+            setReq_status('placing_order');
+            let response = await api.post('/order/place_order', {
+                userName: userState.user.user.name,
+                userPhone: userState.user.user.Phone,
+                userAddress: address,
+                restname: cartState[0].restname,
+                dishes: cartState,
+                totalCost: toPay + deliveryFee,
+            });
+            if (mounted && response.status === 200) {
+                Place_Order(response.data.lastOrder);
+                setPaymentStatus('');
+                setReq_status('');
+            }
+        }
+        if (paymentStatus === 'success')
+        {
+            placeOrder();
+            navigation.navigate('Delivery',{
+                restId : cartState[0].restid
+            });
+        }
+    }, [paymentStatus])
+
     const Currency_Icon = () => {
         return (
             <View style={styles.cashContainer}>
@@ -68,107 +96,116 @@ const PaymentScreen = ({ navigation }) => {
                 <Loading_compo />
             </View> :
             <SafeAreaView style={{ flex: 1 }}>
-                <View style={{ flexDirection: 'row' }}>
-                    <TouchableHighlight style={{ margin: 10 }} onPress={() => navigation.goBack()}  >
-                        <AntDesign name='arrowleft' size={15} />
-                    </TouchableHighlight>
-                    <Text style={{ alignSelf: 'center', marginHorizontal: 10, fontWeight: 'bold' }}>To Pay :</Text>
-                    <MaterialCommunityIcons name='currency-inr' size={20} style={{ alignSelf: 'center' }} />
-                    <Text style={{ alignSelf: 'center', fontWeight: 'bold' }}>{toPay + deliveryFee}</Text>
-                </View>
-                <ScrollView showsVerticalScrollIndicator={false}>
-                    <View style={{ flexDirection: 'row', marginVertical: 10 }}>
-                        <FontAwesome5 name='hotel' size={20} style={styles.iconStyle} />
-                        <View>
-                            <Text style={styles.heading}>{cartState[0].restname}</Text>
+                {
+                    req_status === 'placing_order' ?
+                        <View style={styles.loadingcontainer}>
+                            <Loading_compo />
+                            <Text style={styles.loadingtext}>Please wait, your order is being placed... </Text>
+                        </View> :
+                        <View style={{flex:1}}>
                             <View style={{ flexDirection: 'row' }}>
-                                {
-                                    TotalItems > 1 ? <Text style={styles.normalText}>{TotalItems} items</Text> : <Text style={styles.normalText}>{TotalItems} item</Text>
-                                }
-                                <Text style={{ color: '#a9a9a9', fontSize: 12 }}> | ETA : 30 MINS</Text>
+                                <TouchableHighlight style={{ margin: 10 }} onPress={() => navigation.goBack()}  >
+                                    <AntDesign name='arrowleft' size={15} />
+                                </TouchableHighlight>
+                                <Text style={{ alignSelf: 'center', marginHorizontal: 10, fontWeight: 'bold' }}>To Pay :</Text>
+                                <MaterialCommunityIcons name='currency-inr' size={20} style={{ alignSelf: 'center' }} />
+                                <Text style={{ alignSelf: 'center', fontWeight: 'bold' }}>{toPay + deliveryFee}</Text>
                             </View>
+                            <ScrollView showsVerticalScrollIndicator={false}>
+                                <View style={{ flexDirection: 'row', marginVertical: 10 }}>
+                                    <FontAwesome5 name='hotel' size={20} style={styles.iconStyle} />
+                                    <View>
+                                        <Text style={styles.heading}>{cartState[0].restname}</Text>
+                                        <View style={{ flexDirection: 'row' }}>
+                                            {
+                                                TotalItems > 1 ? <Text style={styles.normalText}>{TotalItems} items</Text> : <Text style={styles.normalText}>{TotalItems} item</Text>
+                                            }
+                                            <Text style={{ color: '#a9a9a9', fontSize: 12 }}> | ETA : 30 MINS</Text>
+                                        </View>
+                                    </View>
+                                </View>
+                                <AntDesign name='arrowdown' size={35} color='#a9a9a9' style={{ position: 'absolute', marginTop: 45, marginLeft: 3 }} />
+                                <View style={{ flexDirection: 'row', marginVertical: 10 }}>
+                                    {
+                                        title.toLowerCase().includes('work') || title.toLowerCase().includes('office') ?
+                                            <Entypo name='suitcase' size={20} style={styles.iconStyle} /> : null
+                                    }
+                                    {
+                                        title.toLowerCase().includes('home') ?
+                                            <Entypo name='home' size={20} style={styles.iconStyle} /> : null
+                                    }
+                                    {
+                                        title.toLowerCase().includes('other') ?
+                                            <Entypo name='location-pin' size={25} style={styles.iconStyle} /> : null
+                                    }
+                                    <View>
+                                        <Text style={styles.heading}>{title}</Text>
+                                        <Text style={styles.normalText}>{address}</Text>
+                                    </View>
+                                </View>
+                                <Border height={30} />
+                                <Billcompo total={toPay} />
+                                <View style={styles.bordercontainer}>
+                                    <Text style={styles.normalText}>Credit/Debit Cards</Text>
+                                </View>
+                                <View>
+                                    <Text style={{ fontSize: 12, alignSelf: 'center', marginTop: 10 }}>You can either pay via {<Text style={{ fontWeight: 'bold' }}>CREDIT/DEBIT/VISA</Text>} to order</Text>
+                                    <View style={{ flexDirection: 'row', marginHorizontal: 35 }}>
+                                        <Fontisto name='mastercard' size={20} color='#a9a9a9' style={{ margin: 5 }} />
+                                        <Fontisto name='visa' size={20} color='#a9a9a9' style={{ margin: 5 }} />
+                                        <Fontisto name='american-express' size={20} color='#a9a9a9' style={{ margin: 5 }} />
+                                    </View>
+                                    <Button
+                                        title='Pay via card'
+                                        buttonStyle={{ backgroundColor: '#00a300', width: 200, alignSelf: 'center', marginVertical: 15 }}
+                                        onPress={() => setIsModalOpen(!isModalOpen)}
+                                    />
+                                </View>
+                                <View>
+                                    <Modal
+                                        visible={isModalOpen}
+                                        animationType='slide'
+                                        transparent
+                                    >
+                                        <View style={styles.modalView}>
+                                            <CustomWebView clientSecret={clientSecret} checkStatus={(term) => setPaymentStatus(term)} closeModal={() => { setIsModalOpen(!isModalOpen); }} />
+                                            <Button
+                                                title='Cancel'
+                                                type='solid'
+                                                buttonStyle={{ backgroundColor: '#4dc9ff' }}
+                                                onPress={() => setIsModalOpen(!isModalOpen)}
+                                            />
+                                        </View>
+                                    </Modal>
+                                </View>
+                                <View style={styles.bordercontainer}>
+                                    <Text style={styles.normalText}>PAY ON DELIVERY</Text>
+                                </View>
+                                <View>
+                                    <View style={{ flexDirection: 'row', marginVertical: 10, marginHorizontal: 5, justifyContent: 'space-between' }}>
+                                        <View style={{ flexDirection: 'row' }}>
+                                            <Currency_Icon />
+                                            <Text style={[styles.heading, { marginLeft: 10 }]}>Cash</Text>
+                                        </View>
+                                        {
+                                            checked ? <Ionicons name='ios-checkmark-circle' size={20} color='#00d100' /> :
+                                                <Pressable onPress={() => setChecked(!checked)} hitSlop={5}>
+                                                    <Ionicons name='ios-checkmark-circle-outline' size={20} color="#a9a9a9" />
+                                                </Pressable>
+                                        }
+                                    </View>
+                                    <Text style={{ fontSize: 12, color: '#a9a9a9', textAlign: 'center' }}>Online payment recommended to reduce contact</Text>
+                                    {
+                                        checked ?
+                                            <Button
+                                                title='Pay with cash'
+                                                buttonStyle={{ width: 200, alignSelf: 'center', backgroundColor: '#00a300', marginVertical: 15 }}
+                                            /> : null
+                                    }
+                                </View>
+                            </ScrollView>
                         </View>
-                    </View>
-                    <AntDesign name='arrowdown' size={35} color='#a9a9a9' style={{ position: 'absolute', marginTop: 45, marginLeft: 3 }} />
-                    <View style={{ flexDirection: 'row', marginVertical: 10 }}>
-                        {
-                            title.toLowerCase().includes('work') || title.toLowerCase().includes('office') ?
-                                <Entypo name='suitcase' size={20} style={styles.iconStyle} /> : null
-                        }
-                        {
-                            title.toLowerCase().includes('home') ?
-                                <Entypo name='home' size={20} style={styles.iconStyle} /> : null
-                        }
-                        {
-                            title.toLowerCase().includes('other') ?
-                                <Entypo name='location-pin' size={25} style={styles.iconStyle} /> : null
-                        }
-                        <View>
-                            <Text style={styles.heading}>{title}</Text>
-                            <Text style={styles.normalText}>{address}</Text>
-                        </View>
-                    </View>
-                    <Border height={30} />
-                    <Billcompo total={toPay} />
-                    <View style={styles.bordercontainer}>
-                        <Text style={styles.normalText}>Credit/Debit Cards</Text>
-                    </View>
-                    <View>
-                        <Text style={{ fontSize: 12, alignSelf: 'center', marginTop: 10 }}>You can either pay via {<Text style={{ fontWeight: 'bold' }}>CREDIT/DEBIT/VISA</Text>} to order</Text>
-                        <View style={{ flexDirection: 'row', marginHorizontal: 35 }}>
-                            <Fontisto name='mastercard' size={20} color='#a9a9a9' style={{ margin: 5 }} />
-                            <Fontisto name='visa' size={20} color='#a9a9a9' style={{ margin: 5 }} />
-                            <Fontisto name='american-express' size={20} color='#a9a9a9' style={{ margin: 5 }} />
-                        </View>
-                        <Button
-                            title='Pay via card'
-                            buttonStyle={{ backgroundColor: '#00a300', width: 200, alignSelf: 'center', marginVertical: 15 }}
-                            onPress={() => setIsModalOpen(!isModalOpen)}
-                        />
-                    </View>
-                    <View>
-                        <Modal
-                            visible={isModalOpen}
-                            animationType='slide'
-                            transparent
-                        >
-                            <View style={styles.modalView}>
-                                <CustomWebView clientSecret={clientSecret} />
-                                <Button
-                                    title='Cancel'
-                                    type='solid'
-                                    buttonStyle={{backgroundColor:'#4dc9ff'}}
-                                    onPress={() => setIsModalOpen(!isModalOpen)}
-                                />
-                            </View>
-                        </Modal>
-                    </View>
-                    <View style={styles.bordercontainer}>
-                        <Text style={styles.normalText}>PAY ON DELIVERY</Text>
-                    </View>
-                    <View>
-                        <View style={{ flexDirection: 'row', marginVertical: 10, marginHorizontal: 5, justifyContent: 'space-between' }}>
-                            <View style={{ flexDirection: 'row' }}>
-                                <Currency_Icon />
-                                <Text style={[styles.heading, { marginLeft: 10 }]}>Cash</Text>
-                            </View>
-                            {
-                                checked ? <Ionicons name='ios-checkmark-circle' size={20} color='#00d100' /> :
-                                    <Pressable onPress={() => setChecked(!checked)} hitSlop={5}>
-                                        <Ionicons name='ios-checkmark-circle-outline' size={20} color="#a9a9a9" />
-                                    </Pressable>
-                            }
-                        </View>
-                        <Text style={{ fontSize: 12, color: '#a9a9a9', textAlign: 'center' }}>Online payment recommended to reduce contact</Text>
-                        {
-                            checked ?
-                                <Button
-                                    title='Pay with cash'
-                                    buttonStyle={{ width: 200, alignSelf: 'center', backgroundColor: '#00a300', marginVertical: 15 }}
-                                /> : null
-                        }
-                    </View>
-                </ScrollView>
+                }
             </SafeAreaView>
     )
 }
@@ -211,5 +248,9 @@ const styles = StyleSheet.create({
     },
     modalView: {
         flex: 1,
+    },
+    loadingtext :{
+        color:"#4dc9ff",
+        marginVertical:10
     }
 })

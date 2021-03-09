@@ -21,15 +21,25 @@ const dishSchema = new Schema({
 })
 
 const orderSchema = new Schema({
-    restId:{
+    OrderId:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:'Restaurant'
+    },
+    restName:{
+        type:String,
     },
     address:{
         type:String,
     },
     delivered:{
         type:Boolean,
+        default:false
+    },
+    orderStatus : {
+        type:String,
+        default:'Delivering'
+    },
+    totalCost :{ 
+        type:mongoose.Types.Currency
     },
     dishes:[dishSchema]
 

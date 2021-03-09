@@ -22,11 +22,26 @@ const Cart = () => {
     const [term, setterm] = useState('');
     const [deliver, setdeliver] = useState(false);
     const [dinein, setdinein] = useState(false);
+    const [err, setErr] = useState(false);
     const scrollY = useRef(new Animated.Value(0)).current;
     const scale_anim = useRef(new Animated.Value(0)).current;
     const server = Server;
 
 
+    const handleDelivery = () => {
+        if (!dinein && !deliver) {
+            setErr(true);
+            return;
+        }
+        let deliveryOption = deliver ? 'Deliver' : 'DineIn';
+        err ? setErr(false) : null;
+        navigation.navigate('Payments', {
+            title: title,
+            address: address,
+            deliveryFee: 10,
+            delivery: deliveryOption
+        });
+    }
 
     const getTotalItems = state.reduce((sum, item) => {
         return sum + item.quantity;
@@ -126,6 +141,8 @@ const Cart = () => {
                             if (dinein) {
                                 setdinein(!dinein)
                             }
+                            if (err)
+                                setErr(!err);
                         }} textStyle={{ color: '#4Dc9FF' }} checkedColor='#4dc9ff' />
                     <CheckBox title='Opt for Dine-In' checked={dinein}
                         containerStyle={styles.CheckBoxstyle} onPress={() => {
@@ -133,6 +150,8 @@ const Cart = () => {
                             if (deliver) {
                                 setdeliver(!deliver);
                             }
+                            if (err)
+                                setErr(!err);
                         }} textStyle={{ color: '#4DC9ff' }} checkedColor='#4dc9ff' />
                 </View>
                 <Border height={15} />
@@ -199,12 +218,11 @@ const Cart = () => {
                                 title='PROCEED TO PAY'
                                 titleStyle={{ fontSize: 14 }}
                                 buttonStyle={{ backgroundColor: '#00a300' }}
-                                onPress={() => navigation.navigate('Payments',{
-                                    title:title,
-                                    address:address,
-                                    deliveryFee:10
-                                })}
+                                onPress={() => handleDelivery()}
                             />
+                            {
+                                err ? <Text style={{ color: "red", fontSize: 12, margin: 5 }}>*One of the options between dineIn or delivery should be selected</Text> : null
+                            }
                         </View> : <View></View>
                 }
             </View>
@@ -269,7 +287,6 @@ const styles = StyleSheet.create({
     },
     bottomContainer: {
         width: screen_width,
-        height: 120
     },
     animated_tick: {
         position: 'absolute',

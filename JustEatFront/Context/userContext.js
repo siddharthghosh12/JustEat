@@ -116,6 +116,14 @@ const userReducer = (state, action) => {
                     }
                 }
             }
+        case "PLACE_ORDER":
+            return {
+                ...state,
+                user: {
+                    ...state.user,
+                    orders: [...state.user.orders,action.payload]
+                }
+            }
         default:
             return state;
     }
@@ -252,7 +260,20 @@ const Edit_info = (dispatch) => async (item) => {
         }
     }
     await AsyncStorage.setItem('user',JSON.stringify(new_user));
-    dispatch({type:"EDIT_INFO",paylaod:item})
+    dispatch({type:"EDIT_INFO",payload:item})
 }
 
-export const { Context, Provider } = createDataContext(userReducer, { Login, Logout, Save_address, Set_address, Handle_favourites, Edit_Address, Delete_Address,Edit_info }, initailState)
+const Place_Order = (dispatch) => async (item) => {
+    let prev_user = await AsyncStorage.getItem('user');
+    let user = JSON.parse(prev_user);
+
+    let new_user = {
+        ...user,
+        orders :[...user.orders,item]
+    }
+
+    await AsyncStorage.setItem('user',JSON.stringify(new_user));
+    dispatch({type:"PLACE_ORDER",payload:item});
+}
+
+export const { Context, Provider } = createDataContext(userReducer, { Login, Logout, Save_address, Set_address, Handle_favourites, Edit_Address, Delete_Address,Edit_info,Place_Order }, initailState)

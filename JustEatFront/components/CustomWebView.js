@@ -4,7 +4,7 @@ import {Image,View} from 'react-native'
 
 const STRIPE_PK = 'pk_test_51IGQjZEaYUO8XnrmJ6Dgp7soqNrOTTsDcbOJcvt0dEVPtkxAA8vSLvbU7sdn5jTCQ2fSpSHvh82HdJkGL7ARAYZP00O7yA0xIw'
 
-const CustomWebView = ({clientSecret}) => {
+const CustomWebView = ({clientSecret,checkStatus,closeModal}) => {
 
 const htmlContent = `
      <!DOCTYPE html>
@@ -100,73 +100,71 @@ const htmlContent = `
                         display: none;
                       }
                       
-                    .spinner,
-                    .spinner:before,
-                    .spinner:after {
-                    border-radius: 50%;
+                      .loading-container {
+                        display:flex;
+                        justify-content:center;
+                        align-items:center;
+                        flex-direction:column;
+                        width:100vw
+                        background-color:#4dc9ff;
+                        height:100vh
                     }
-                    .spinner {
-                    color: #ffffff;
-                    font-size: 22px;
-                    text-indent: -99999px;
-                    margin: 0px auto;
-                    position: relative;
-                    width: 20px;
-                    height: 20px;
-                    box-shadow: inset 0 0 0 2px;
-                    -webkit-transform: translateZ(0);
-                    -ms-transform: translateZ(0);
-                    transform: translateZ(0);
+                    .loading {
+                        width:150px;
+                        height:150px;
+                        box-sizing:border-box;
+                        border-radius:50%;
+                        border-top: 10px solid #e74c3c;
+                        position:relative;
+                        animation: a1 2s linear infinite;
                     }
-                    .spinner:before,
-                    .spinner:after {
-                    position: absolute;
-                    content: "";
+                    .loading::before,.loading::after {
+                        content: '';
+                        width:150px;
+                        height:150px;
+                        position:absolute;
+                        left:0;
+                        top:-10px;
+                        box-sizing:border-box;
+                        border-radius:50%;
                     }
-                    .spinner:before {
-                    width: 10.4px;
-                    height: 20.4px;
-                    background: #5469d4;
-                    border-radius: 20.4px 0 0 20.4px;
-                    top: -0.2px;
-                    left: -0.2px;
-                    -webkit-transform-origin: 10.4px 10.2px;
-                    transform-origin: 10.4px 10.2px;
-                    -webkit-animation: loading 2s infinite ease 1.5s;
-                    animation: loading 2s infinite ease 1.5s;
+                    .loading::before {
+                        border-top: 10px solid #e67e22;
+                        transform : rotate(120deg);
                     }
-                    .spinner:after {
-                    width: 10.4px;
-                    height: 10.2px;
-                    background: #5469d4;
-                    border-radius: 0 10.2px 10.2px 0;
-                    top: -0.1px;
-                    left: 10.2px;
-                    -webkit-transform-origin: 0px 10.2px;
-                    transform-origin: 0px 10.2px;
-                    -webkit-animation: loading 2s infinite ease;
-                    animation: loading 2s infinite ease;
+                    .loading::after {
+                        border-top: 10px solid #3495db;
+                        transform : rotate(240deg);
                     }
-                    @-webkit-keyframes loading {
-                    0% {
-                        -webkit-transform: rotate(0deg);
-                        transform: rotate(0deg);
+                    .loading span {
+                        position:absolute;
+                        width:100px
+                        height:100px;
+                        color:#4dc9ff;
+                        padding:20px;
+                        align-self:center;
+                        line-height:100px;
+                        box-sizing:border-box;
+                        animation: a2 2s linear infinite
                     }
-                    100% {
-                        -webkit-transform: rotate(360deg);
-                        transform: rotate(360deg);
+                    
+                    .loading_text {
+                        font-size:10px;
+                        margin-top:10px;
+                        color:#4dc9ff
                     }
+
+                    @keyframes a1 {
+                        to {
+                            transform:rotate(360deg)
+                        }
                     }
-                    @keyframes loading {
-                    0% {
-                        -webkit-transform: rotate(0deg);
-                        transform: rotate(0deg);
+                    @keyframes a2 {
+                        to {
+                            transform:rotate(-360deg)
+                        }
                     }
-                    100% {
-                        -webkit-transform: rotate(360deg);
-                        transform: rotate(360deg);
-                    }
-                    }
+
                 </style>
             
             </head>
@@ -232,8 +230,14 @@ const htmlContent = `
                                     </button>
                            
                         </form>
-            
-                    
+                        <div class='row hidden' id='payment_processing'>
+                            <div class="loading-container">
+                                <div class='loading'>
+                                    <span>Loading...</span>
+                                </div>
+                                <span class='loading_text'>Please wait while your payment is being confirmed...</span>
+                            </div>
+                        </div>
                 </div>
                 
                 <script>
@@ -307,7 +311,10 @@ const htmlContent = `
                                     card:card
                                 }
                             }).then(function(result) {
-                                window.postMessage(JSON.stringify(result),'*');
+                                if(result.paymentIntent.status === "succeeded")
+                                    window.postMessage("success");
+                                else
+                                    window.postMessage("failed");    
                             })
                         }
 
@@ -318,10 +325,14 @@ const htmlContent = `
                               document.querySelector("button").disabled = true;
                               document.querySelector("#spinner").classList.remove("hidden");
                               document.querySelector("#button-text").classList.add("hidden");
+                              document.querySelector("#payment_processing").classList.remove("hidden")
+                              document.querySelector("form").classList.add("hidden");
                             } else {
                               document.querySelector("button").disabled = false;
                               document.querySelector("#spinner").classList.add("hidden");
                               document.querySelector("#button-text").classList.remove("hidden");
+                              document.querySelector("form").classList.remove("hidden");
+                              document.querySelector("#payment_processing").classList.add("hidden")
                             }
                           };
                 </script>
@@ -337,7 +348,12 @@ const injectedJavaScript = `(function() {
 
 const onMessage = (event) => {
     const { data } = event.nativeEvent;
-    console.log(data)
+    if(data == "success")
+    {
+        console.log('entered')
+        checkStatus('success');
+        closeModal()
+    }
 }
 
 

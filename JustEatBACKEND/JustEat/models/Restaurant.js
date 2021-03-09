@@ -67,8 +67,15 @@ const RestaurantSchema = new Schema({
     CostFor2 : {
         type:String
     },
+    Phone :{
+        type:String,
+        default:'',
+    },
     currentlyOrdering:{
         type:Boolean
+    },
+    location : {
+        type:Object
     },
     dishes:[dishSchema]
 })

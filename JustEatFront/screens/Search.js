@@ -97,7 +97,9 @@ const SearchScreen = () => {
 
     return (
         loading ?
-            <Loading_compo />
+           <View style={styles.loading_container}>
+                <Loading_compo />
+           </View>
             :
 
             <View style={styles.container}>
@@ -188,6 +190,12 @@ const styles = StyleSheet.create({
     InputStyle: {
         flex: 1,
         marginLeft: 5
+    },
+    loading_container :{
+        display:'flex',
+        justifyContent:'center',
+        alignItems:'center',
+        flex:1
     }
 });
 

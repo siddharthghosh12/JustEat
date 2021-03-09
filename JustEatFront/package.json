@@ -47,11 +47,12 @@
     "react-native-svg": "^12.1.0",
     "react-native-vector-icons": "^7.1.0",
     "react-native-web": "~0.13.12",
-    "react-native-webview": "^11.2.1"
+    "react-native-webview": "^10.7.0"
   },
   "devDependencies": {
     "@babel/core": "~7.9.0",
-    "@types/node": "^14.14.20"
+    "@types/node": "^14.14.20",
+    "@types/react-native-maps": "^0.24.0"
   },
   "private": true
 }
