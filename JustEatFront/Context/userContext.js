@@ -124,6 +124,24 @@ const userReducer = (state, action) => {
                     orders: [...state.user.orders,action.payload]
                 }
             }
+        case "ORDER_RECEIVED":
+            let order_arr = state.user.orders.map(a => { return{...a}});
+            let j;
+            for(j=0;j<order_arr.length;j++)
+            {
+                if(order_arr[j].OrderId === action.payload)
+                {
+                    order_arr[j].delivered=true;
+                    order_arr[j].orderStatus = 'delivered';
+                }
+            }
+            return {
+                ...state,
+                user :{
+                    ...state.user,
+                    orders:[...order_arr]
+                }
+            }
         default:
             return state;
     }
@@ -276,4 +294,27 @@ const Place_Order = (dispatch) => async (item) => {
     dispatch({type:"PLACE_ORDER",payload:item});
 }
 
-export const { Context, Provider } = createDataContext(userReducer, { Login, Logout, Save_address, Set_address, Handle_favourites, Edit_Address, Delete_Address,Edit_info,Place_Order }, initailState)
+
+const Received_order = (dispatch) => async(item) => {
+
+    let old_user = await AsyncStorage.getItem('user');
+    let user = JSON.parse(old_user);
+
+    let order_array = user.orders.map(a => {return {...a}});
+    let i;
+    for(i=0;i<order_array.length;++i)
+    {
+        if(order_array[i].OrderId === item)
+        {
+            order_array[i].delivered = true;
+            order_array[i].orderStatus = 'delivered'
+        }
+    }
+    let new_user = {
+        ...user,
+        orders:[...order_array]
+    }
+    await AsyncStorage.setItem('user',JSON.stringify(new_user));
+    dispatch({type:"ORDER_RECEIVED",payload:item})
+}
+export const { Context, Provider } = createDataContext(userReducer, { Login, Logout, Save_address, Set_address, Handle_favourites, Edit_Address, Delete_Address,Edit_info,Place_Order,Received_order }, initailState)

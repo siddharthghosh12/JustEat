@@ -29,15 +29,12 @@ const RestResultcompo = ({ title }) => {
         let index = state?.user?.orders?.findIndex(item => item.orderStatus === 'Delivering')
         if (index !== -1)
             {
-                console.log('InsideIf',state)
-                console.log('index',index);
                 setId(state?.user?.orders[index]?.restId);
             }
     }
 
     // gets the list of restaurants the when the screen loads for the first time
     useEffect(() => {
-        console.log('User',state?.user)
         let mounted = true;
         (async () => {
             let response = await dishapi.get('/restaurants');
@@ -54,7 +51,6 @@ const RestResultcompo = ({ title }) => {
         let mounted=true
         if(mounted)
             getId()
-            console.log(Id)
     },[state?.user?.orders])
     const img_name = 'icon.jpg';
     // header component of flatlist displaying the list of top dishes

@@ -93,4 +93,30 @@ OrderRouter.get('/check_status/:OrderId',(req,res,next) => {
         .catch(e => console.log(e));
 })
 
+OrderRouter.post('/received_order',(req,res,next) => {
+    const phone = String(req.body.Phone).replace(/[^\d]/g, '');
+    const orderId = req.body.orderId;
+    Users.findOne({Phone:phone})
+        .then((user) => {
+            user.pastOrders.map((item) => {
+                if(item.OrderId.toString() === orderId.toString())
+                {
+                    item.delivered = true;
+                    item.orderStatus = 'delivered';
+                    return item;
+                }
+                return item;
+            })
+            user.save((err, user) => {
+                if (err)
+                  return res.status(422).send({ error: err })
+                else {
+                  res.statusCode = 200;
+                  res.setHeader('Content-Type', 'application/json')
+                  res.send({ success: true });
+                }
+              })
+        }).catch(e => console.log(e));
+})
+
 module.exports = OrderRouter;
