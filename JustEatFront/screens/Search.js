@@ -22,7 +22,7 @@ const SearchScreen = () => {
   const [results, setresults] = useState([]);
   const [search, setsearch] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [isConnected, setIsConnected] = useState(false);
+  const [isConnected, setIsConnected] = useState(true);
   let timer_ref = useRef(null);
 
   const burger_img = "burgersearch.jpg";
