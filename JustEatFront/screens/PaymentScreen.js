@@ -7,7 +7,6 @@ import {
   ScrollView,
   Pressable,
   Modal,
-  Image,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
@@ -22,17 +21,20 @@ import { useRoute, StackActions } from "@react-navigation/native";
 import { Context as DishContext } from "../Context/dishContext";
 import { Context as UserContext } from "../Context/userContext";
 import { Button } from "react-native-elements";
+import NetInfo from "@react-native-community/netinfo";
 import Border from "../thickborder";
 import Billcompo from "../components/Bill";
 import Loading_compo from "../components/Loadingcompo";
 import CustomWebView from "../components/CustomWebView";
 import api from "../api/dishapi";
 import useCart from "../hooks/useCart";
+import Netinfo from "../components/Netinfo";
 
 const PaymentScreen = ({ navigation }) => {
   const route = useRoute();
   const { state: cartState } = useContext(DishContext);
   const { state: userState, Place_Order } = useContext(UserContext);
+  const [isConnected, setIsConnected] = useState(true);
   const [checked, setChecked] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [clientSecret, setClientSecret] = useState("");
@@ -48,15 +50,20 @@ const PaymentScreen = ({ navigation }) => {
   useEffect(() => {
     let mounted = true;
     const getClientSecret = async () => {
-      setReq_status("loading");
-      let response = await api.post("/pay/payViaCard", {
-        email: userState.user.user.email,
-        amount: (toPay + deliveryFee) * 100,
-        address: address,
-      });
-      if (mounted) {
+      try {
+        setReq_status("loading");
+        let response = await api.post("/pay/payViaCard", {
+          email: userState.user.user.email,
+          amount: (toPay + deliveryFee) * 100,
+          address: address,
+        });
+        if (mounted) {
+          setReq_status("");
+          setClientSecret(response.data.clientSecret);
+        }
+      } catch (e) {
+        console.log(e);
         setReq_status("");
-        setClientSecret(response.data.clientSecret);
       }
     };
 
@@ -64,7 +71,7 @@ const PaymentScreen = ({ navigation }) => {
     return () => {
       mounted = false;
     };
-  }, [cartState]);
+  }, [cartState, isConnected]);
 
   useEffect(() => {
     let mounted = true;
@@ -80,11 +87,11 @@ const PaymentScreen = ({ navigation }) => {
       });
       if (mounted && response.status === 200) {
         Place_Order(response.data.lastOrder);
-          navigation.dispatch(
-            StackActions.replace("Delivery", {
-              restId: cartState[0]?.restid,
-            })
-          );
+        navigation.dispatch(
+          StackActions.replace("Delivery", {
+            restId: cartState[0]?.restid,
+          })
+        );
         setPaymentStatus("");
         setReq_status("");
       }
@@ -92,8 +99,18 @@ const PaymentScreen = ({ navigation }) => {
     if (paymentStatus === "success") {
       placeOrder();
     }
-    return () => mounted=false;
+    return () => (mounted = false);
   }, [paymentStatus]);
+
+  useEffect(() => {
+    const Subscribe = NetInfo.addEventListener((state) => {
+      if (state.isConnected) {
+        setIsConnected(true);
+      } else setIsConnected(false);
+    });
+
+    return () => Subscribe();
+  }, []);
 
   const Currency_Icon = () => {
     return (
@@ -107,7 +124,7 @@ const PaymentScreen = ({ navigation }) => {
     <View style={styles.loadingcontainer}>
       <Loading_compo />
     </View>
-  ) : (
+  ) : isConnected ? (
     <SafeAreaView style={{ flex: 1 }}>
       {req_status === "placing_order" ? (
         <View style={styles.loadingcontainer}>
@@ -303,6 +320,8 @@ const PaymentScreen = ({ navigation }) => {
         </View>
       )}
     </SafeAreaView>
+  ) : (
+    <Netinfo />
   );
 };
 
